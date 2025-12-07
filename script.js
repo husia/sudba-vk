@@ -111,7 +111,7 @@ function getTitle(outcome) {
 
 function shareResult() {
   const link = isInVK() 
-    ? `https://vk.com/appВАШ_APP_ID?ref=${userId}`
+    ? `https://vk.com/app54388761?ref=${userId}`
     : "https://vk.com/app123456789?ref=demo123";
   
   if (isInVK()) {
