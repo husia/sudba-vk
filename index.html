@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Судьба за 10 секунд</title>
+  <style>
+    /* ВСЕ СТИЛИ ТЕ ЖЕ, ЧТО РАНЬШЕ — БЕЗ ИЗМЕНЕНИЙ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: white;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .story-box {
+      background: rgba(0,0,0,0.2);
+      border-radius: 18px;
+      padding: 20px;
+      margin: 20px 0;
+      font-size: 18px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      border: 1px dashed rgba(255,255,255,0.3);
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+    .btn-free { background: linear-gradient(45deg, #ff9a9e, #fad0c4); color: #8b4513; }
+    .btn-premium { background: linear-gradient(45deg, #a1c4fd, #c2e9fb); color: #2c3e50; }
+    .btn-share { background: linear-gradient(45deg, #43e97b, #38f9d7); color: #0a3d30; }
+    .result {
+      background: rgba(0,0,0,0.25);
+      border-radius: 20px;
+      padding: 24px;
+      margin: 24px 0;
+      font-size: 18px;
+      line-height: 1.6;
+      border: 2px solid #ffcc00;
+    }
+    .rarity {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      background: rgba(255,255,255,0.2);
+    }
+    .friends {
+      background: rgba(0,0,0,0.2);
+      padding: 16px;
+      border-radius: 16px;
+      margin: 16px 0;
+      font-style: italic;
+    }
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .demo-note {
+      background: rgba(0,0,0,0.3);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔥 Судьба за 10 секунд</h1>
+    <div id="game">
+      <p>Загрузка историй...</p>
+    </div>
+    <div class="footer">Создано с абсурдом и любовью ❤️</div>
+  </div>
+  <div class="confetti" id="confetti"></div>
+
+  <!-- Подключаем логику -->
+  <script src="script.js"></script>
+</body>
+</html>
