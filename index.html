@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru">
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com;
-  script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com;
-  style-src 'self' 'unsafe-inline' https://*.vk.com;
-  img-src 'self' data: https://*.vk.com https://*.vk-portal.net;
-  connect-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://husia.github.io;
-  frame-src 'self' https://*.vk.com;
-  upgrade-insecure-requests;
-">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer">
   <title>Судьба за 10 секунд</title>
+  
+  <!-- Content Security Policy для обхода strict-origin-when-cross-origin -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com;
+    script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
+    style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
+    img-src 'self' data: https://*.vk.com https://*.vk-portal.net https://vk.com;
+    connect-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://husia.github.io https://vk.com;
+    frame-src 'self' https://*.vk.com https://vk.com;
+    child-src 'self' https://*.vk.com https://vk.com;
+    worker-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    upgrade-insecure-requests;
+  ">
+  
   <style>
-    /* ВСЕ СТИЛИ ТЕ ЖЕ, ЧТО РАНЬШЕ — БЕЗ ИЗМЕНЕНИЙ */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
@@ -68,10 +81,31 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
-    .btn-free { background: linear-gradient(45deg, #ff9a9e, #fad0c4); color: #8b4513; }
-    .btn-premium { background: linear-gradient(45deg, #a1c4fd, #c2e9fb); color: #2c3e50; }
-    .btn-share { background: linear-gradient(45deg, #43e97b, #38f9d7); color: #0a3d30; }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    .btn-free {
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+      color: #8b4513;
+    }
+    .btn-premium {
+      background: linear-gradient(45deg, #a1c4fd, #c2e9fb);
+      color: #2c3e50;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-premium::after {
+      content: "💎";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .btn-share {
+      background: linear-gradient(45deg, #43e97b, #38f9d7);
+      color: #0a3d30;
+    }
     .result {
       background: rgba(0,0,0,0.25);
       border-radius: 20px;
@@ -80,6 +114,11 @@
       font-size: 18px;
       line-height: 1.6;
       border: 2px solid #ffcc00;
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .rarity {
       display: inline-block;
@@ -129,9 +168,9 @@
     </div>
     <div class="footer">Создано с абсурдом и любовью ❤️</div>
   </div>
+
   <div class="confetti" id="confetti"></div>
 
-  <!-- Подключаем логику -->
-  <script src="script.js"></script>
+  <script src="script.js" async defer></script>
 </body>
 </html>
