@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com;
+  script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com;
+  style-src 'self' 'unsafe-inline' https://*.vk.com;
+  img-src 'self' data: https://*.vk.com https://*.vk-portal.net;
+  connect-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://husia.github.io;
+  frame-src 'self' https://*.vk.com;
+  upgrade-insecure-requests;
+">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Судьба за 10 секунд</title>
