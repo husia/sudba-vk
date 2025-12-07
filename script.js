@@ -28,23 +28,43 @@ let STORIES = {};
 let userId = 'demo123';
 
 async function initApp() {
+  // Проверка подлинности для VK
+  const urlParams = new URLSearchParams(window.location.search);
+  const vkUserId = urlParams.get('vk_user_id');
+  const vkAppId = urlParams.get('vk_app_id');
+  const vkIsAppUser = urlParams.get('vk_is_app_user');
+  const vkIsFavorite = urlParams.get('vk_is_favorite');
+  const vkRef = urlParams.get('vk_ref');
+  
+  // Если параметры VK есть — это настоящий запуск в приложении
+  const isRealVK = vkUserId && vkAppId;
+  
   // Загружаем истории
   STORIES = await loadStories();
 
-  if (isInVK()) {
-    // Режим ВКонтакте
+  if (isRealVK && isInVK()) {
     try {
+      // Инициализируем VK Bridge
       const { bridge } = await import('https://unpkg.com/@vkontakte/vk-bridge/dist/vk-bridge.umd.js');
       bridge.send('VKWebAppInit');
+      
+      // Получаем данные пользователя
       const user = await bridge.send('VKWebAppGetUserInfo');
       userId = user.id;
+      
+      // Отправляем статистику для корректной работы stats.vk-portal.net
+      bridge.send('VKWebAppConversionHit', { 
+        pixel_code: 'default' 
+      }).catch(e => console.log('Stats init:', e));
+      
       showRandomStory();
     } catch (e) {
       console.error('VK Error:', e);
-      showRandomStory(); // fallback
+      showRandomStory();
     }
   } else {
     // Локальный демо-режим
+    userId = 'demo123';
     showRandomStory();
     showDemoNote();
   }
