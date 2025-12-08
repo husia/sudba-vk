@@ -148,38 +148,6 @@
       border-radius: 10px;
       font-size: 14px;
     }
-    .image-preview {
-      max-width: 100%;
-      border-radius: 12px;
-      margin: 15px 0;
-      border: 2px solid rgba(255,255,255,0.3);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    .share-options {
-      background: rgba(0,0,0,0.3);
-      border-radius: 16px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .share-options h3 {
-      color: #ffd700;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-    .share-method {
-      background: rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 15px;
-      margin: 10px 0;
-      text-align: left;
-    }
-    .share-method h4 {
-      color: #a1c4fd;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
   </style>
 </head>
 <body>
@@ -230,7 +198,7 @@
     let userId = 'demo123';
     const APP_ID = '54388761';
     let isSharing = false;
-    let currentStoryImageUrl = null;
+    let currentImageBlobUrl = null;
 
     // ФУНКЦИИ
     function isInVK() {
@@ -276,7 +244,7 @@
           ${outcome}
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
-        <button class="btn btn-share" onclick="prepareForSharing()">📲 Поделиться результатом</button>
+        <button class="btn btn-share" onclick="createAndShareStory()">📲 Поделиться в историях</button>
         <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
       `;
       
@@ -293,168 +261,96 @@
       return "Тайная личность";
     }
 
-    // СОЗДАНИЕ УПРОЩЕННОЙ КАРТИНКИ (меньший размер)
-    function createSimpleStoryImage() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1080;
-      canvas.height = 1920;
-      const ctx = canvas.getContext('2d');
-      
-      // ПРОСТОЙ ФОН (без сложных градиентов)
-      ctx.fillStyle = '#6a11cb';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Декоративные элементы
-      ctx.fillStyle = '#2575fc';
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2, 300, 150, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Текст
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 80px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      ctx.fillText('🔥', canvas.width / 2, 300);
-      ctx.font = 'bold 70px Arial';
-      ctx.fillText('СУДЬБА', canvas.width / 2, 450);
-      ctx.fillText('ЗА 10 СЕКУНД', canvas.width / 2, 530);
-      
-      // Результат
-      const outcome = document.querySelector('.result').textContent;
-      const title = getTitle(outcome);
-      
-      ctx.font = 'bold 60px Arial';
-      ctx.fillStyle = '#ffcc00';
-      ctx.fillText('ТЫ СТАЛ:', canvas.width / 2, 700);
-      
-      ctx.font = 'bold 80px Arial';
-      ctx.fillStyle = '#ff416c';
-      ctx.fillText(title.toUpperCase(), canvas.width / 2, 800);
-      
-      // Основной текст (упрощенный)
-      const textWithoutTitle = outcome.replace(`ТЫ СТАЛ: ${title}`, '').trim();
-      ctx.font = 'bold 40px Arial';
-      ctx.fillStyle = 'white';
-      ctx.textAlign = 'left';
-      
-      const lines = textWithoutTitle.split('\n').filter(line => line.trim() !== '');
-      let y = 950;
-      
-      for (let i = 0; i < Math.min(lines.length, 6); i++) { // Ограничиваем 6 строками
-        ctx.fillText(lines[i], 80, y);
-        y += 70;
-      }
-      
-      // Ссылка
-      ctx.textAlign = 'center';
-      ctx.font = 'bold 50px Arial';
-      ctx.fillStyle = '#4CAF50';
-      ctx.fillText('vk.com/app' + APP_ID, canvas.width / 2, 1650);
-      
-      // Сохраняем URL картинки
-      currentStoryImageUrl = canvas.toDataURL('image/png');
-      return currentStoryImageUrl;
-    }
-
-    // ПОДГОТОВКА К ШЕРИНГУ
-    async function prepareForSharing() {
-      updateStatus('🔄 Подготавливаю результат...');
-      
-      // Создаем картинку
-      const imageUrl = createSimpleStoryImage();
-      
-      // Показываем варианты шеринга
-      showShareOptions(imageUrl);
-      updateStatus('✅ Выберите способ поделиться');
-    }
-
-    // ПОКАЗ ВАРИАНТОВ ШЕРИНГА
-    function showShareOptions(imageUrl) {
-      const title = getTitle(document.querySelector('.result').textContent);
-      const shareText = `🔥 Я стал: ${title}!\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}`;
-      
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      document.getElementById('game').innerHTML = `
-        <div class="result" id="resultBox">
-          ${document.querySelector('.result').innerHTML}
-        </div>
+    // СОЗДАНИЕ МИНИМАЛЬНОЙ КАРТИНКИ ДЛЯ VK
+    function createMinimalImageForVK() {
+      return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        // Минимальный размер для уменьшения Data URL
+        canvas.width = 800;
+        canvas.height = 1420;
+        const ctx = canvas.getContext('2d');
         
-        <div class="share-options">
-          <h3>🎯 Выберите способ поделиться</h3>
-          
-          <div class="share-method">
-            <h4>🤖 <strong>Автоматически</strong> (работает на ПК)</h4>
-            <p>Попробуйте создать историю через VK API:</p>
-            <button class="btn" style="background: linear-gradient(45deg, #6a11cb, #2575fc); margin-top: 10px; width: 100%;" 
-                    onclick="tryAutoCreateStory()">
-              🚀 Создать историю автоматически
-            </button>
-          </div>
-          
-          <div class="share-method">
-            <h4>📱 <strong>Для мобильных</strong></h4>
-            <p>${isMobile ? 'Нажмите на картинку, чтобы сохранить её, затем откройте VK и создайте историю:' : 'Сохраните картинку:'}</p>
-            <img src="${imageUrl}" class="image-preview" 
-                 onclick="downloadImage('${imageUrl.replace(/'/g, "\\'")}', 'sudyba-${title}.png')"
-                 style="cursor: pointer;">
-            <button class="btn" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); margin-top: 10px; width: 100%;" 
-                    onclick="downloadImage('${imageUrl.replace(/'/g, "\\'")}', 'sudyba-${title}.png')">
-              💾 Сохранить картинку
-            </button>
-          </div>
-          
-          <div class="share-method">
-            <h4>📋 <strong>Скопировать текст</strong></h4>
-            <p>Скопируйте текст, чтобы поделиться им:</p>
-            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px; word-break: break-all;">
-              ${shareText}
-            </div>
-            <button class="btn" style="background: linear-gradient(45deg, #ff9800, #ff5722); margin-top: 10px; width: 100%;" 
-                    onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n').replace(/'/g, "\\'")}')">
-              📋 Скопировать текст
-            </button>
-          </div>
-          
-          ${isMobile ? `
-          <div class="share-method">
-            <h4>🔗 <strong>Поделиться через телефон</strong></h4>
-            <p>Используйте системный шеринг телефона:</p>
-            <button class="btn" style="background: linear-gradient(45deg, #9C27B0, #673AB7); margin-top: 10px; width: 100%;" 
-                    onclick="shareViaNative()">
-              📲 Поделиться через телефон
-            </button>
-          </div>
-          ` : ''}
-        </div>
+        // ОЧЕНЬ ПРОСТОЙ ФОН - один цвет
+        ctx.fillStyle = '#6a11cb';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
-      `;
+        // Минимальный текст
+        const outcome = document.querySelector('.result').textContent;
+        const title = getTitle(outcome);
+        
+        // Заголовок
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 60px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        ctx.fillText('🔥', canvas.width / 2, 150);
+        ctx.font = 'bold 50px Arial';
+        ctx.fillText('СУДЬБА ЗА 10 СЕКУНД', canvas.width / 2, 250);
+        
+        // Результат
+        ctx.font = 'bold 40px Arial';
+        ctx.fillStyle = '#ffcc00';
+        ctx.fillText('ТЫ СТАЛ:', canvas.width / 2, 400);
+        
+        ctx.font = 'bold 60px Arial';
+        ctx.fillStyle = '#ff416c';
+        ctx.fillText(title.toUpperCase(), canvas.width / 2, 500);
+        
+        // Только 3 строки текста
+        ctx.font = '30px Arial';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        
+        const lines = outcome.split('\n').filter(line => line.trim() !== '');
+        for (let i = 0; i < Math.min(3, lines.length); i++) {
+          if (!lines[i].includes('ТЫ СТАЛ:')) {
+            ctx.fillText(lines[i], canvas.width / 2, 600 + (i * 50));
+          }
+        }
+        
+        // Ссылка маленьким шрифтом
+        ctx.font = '25px Arial';
+        ctx.fillStyle = '#4CAF50';
+        ctx.fillText('vk.com/app' + APP_ID, canvas.width / 2, 1300);
+        
+        // Используем Blob вместо Data URL
+        canvas.toBlob((blob) => {
+          const blobUrl = URL.createObjectURL(blob);
+          currentImageBlobUrl = blobUrl;
+          resolve(blobUrl);
+        }, 'image/jpeg', 0.8); // JPEG с качеством 80% для уменьшения размера
+      });
     }
 
-    // ПОПЫТКА АВТОМАТИЧЕСКОГО СОЗДАНИЯ
-    async function tryAutoCreateStory() {
+    // ГЛАВНАЯ ФУНКЦИЯ ШЕРИНГА
+    async function createAndShareStory() {
       if (isSharing) return;
       isSharing = true;
       
-      updateStatus('🔄 Пытаюсь создать историю через VK API...');
+      updateStatus('🔄 Готовлю историю...');
       
       try {
+        // Проверяем VK Bridge
         if (!window.vkBridge) {
           updateStatus('❌ VK Bridge не загружен');
-          alert('VK Bridge не загружен. Используйте другие методы.');
+          showManualInstructions();
           return;
         }
         
+        // Инициализируем
         await window.vkBridge.send('VKWebAppInit', {});
-        updateStatus('✅ Приложение инициализировано');
+        updateStatus('✅ VK готов');
         
-        // Попробуем создать историю с упрощенной картинкой
+        // Создаем минимальную картинку
+        updateStatus('🔄 Создаю картинку...');
+        const imageUrl = await createMinimalImageForVK();
+        
+        // Пробуем создать историю
+        updateStatus('🔄 Отправляю в VK...');
         const result = await window.vkBridge.send('VKWebAppShowStoryBox', {
           background_type: 'image',
-          url: currentStoryImageUrl || createSimpleStoryImage()
+          url: imageUrl
         });
         
         if (result && result.result) {
@@ -471,7 +367,7 @@
       } catch (error) {
         console.error('Ошибка создания истории:', error);
         
-        let errorMessage = 'Не удалось создать историю автоматически';
+        let errorMessage = 'Не удалось создать историю';
         if (error.error_message) {
           errorMessage = error.error_message;
         } else if (error.message) {
@@ -480,77 +376,111 @@
         
         updateStatus(`❌ ${errorMessage}`);
         
-        // Показываем понятное сообщение
-        if (errorMessage.includes('denied') || errorMessage.includes('отказано')) {
-          alert('Вы отказались от создания истории. Используйте другие методы.');
-        } else if (errorMessage.includes('image')) {
-          alert('Автоматическое создание не работает на мобильном. Сохраните картинку вручную.');
-        } else {
-          alert('Автоматическое создание не сработало. Используйте другие методы.');
+        // Очищаем Blob URL
+        if (currentImageBlobUrl) {
+          URL.revokeObjectURL(currentImageBlobUrl);
+          currentImageBlobUrl = null;
         }
+        
+        // Показываем альтернативу
+        showManualInstructions();
         
       } finally {
         isSharing = false;
       }
     }
 
-    // СКАЧИВАНИЕ КАРТИНКИ
-    function downloadImage(dataUrl, filename) {
-      try {
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        setTimeout(() => {
-          alert(`✅ Картинка сохранена как "${filename}"!\n\nТеперь откройте VK:\n1. Нажмите "Создать историю"\n2. Добавьте сохраненную картинку\n3. Опубликуйте историю!`);
-        }, 500);
-        
-      } catch (error) {
-        console.error('Ошибка скачивания:', error);
-        alert('❌ Не удалось сохранить картинку. Попробуйте нажать на картинку правой кнопкой и выбрать "Сохранить как".');
-      }
+    // ИНСТРУКЦИИ ДЛЯ РУЧНОГО ШЕРИНГА
+    function showManualInstructions() {
+      const title = getTitle(document.querySelector('.result').textContent);
+      const shareText = `🔥 Я стал: ${title}!\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}`;
+      
+      // Создаем простую картинку для скачивания
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1920;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = '#6a11cb';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 80px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      ctx.fillText('🔥', canvas.width / 2, 300);
+      ctx.font = 'bold 70px Arial';
+      ctx.fillText('СУДЬБА', canvas.width / 2, 450);
+      ctx.fillText('ЗА 10 СЕКУНД', canvas.width / 2, 530);
+      
+      ctx.font = 'bold 60px Arial';
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillText('ТЫ СТАЛ:', canvas.width / 2, 700);
+      
+      ctx.font = 'bold 80px Arial';
+      ctx.fillStyle = '#ff416c';
+      ctx.fillText(title.toUpperCase(), canvas.width / 2, 800);
+      
+      ctx.font = 'bold 50px Arial';
+      ctx.fillStyle = '#4CAF50';
+      ctx.fillText('vk.com/app' + APP_ID, canvas.width / 2, 1500);
+      
+      const dataUrl = canvas.toDataURL('image/png');
+      
+      document.getElementById('game').innerHTML = `
+        <div class="result" id="resultBox">
+          ${document.querySelector('.result').innerHTML}
+        </div>
+        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 16px; margin: 20px 0;">
+          <h3 style="color: #ffd700; margin-bottom: 15px;">📱 Как поделиться на мобильном</h3>
+          <p style="margin-bottom: 15px;">Автоматическое создание не сработало. Используйте этот способ:</p>
+          
+          <p><strong>1. Сохраните картинку:</strong></p>
+          <img src="${dataUrl}" style="width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid rgba(255,255,255,0.3);"
+               onclick="downloadImage('${dataUrl.replace(/'/g, "\\'")}', 'sudyba-${title}.png')">
+          
+          <p style="margin: 15px 0;"><strong>2. Скопируйте текст для поста:</strong></p>
+          <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
+            ${shareText}
+          </div>
+          
+          <p><em>Откройте VK → Создать историю → Добавьте картинку</em></p>
+        </div>
+        <button class="btn btn-share" onclick="createAndShareStory()">🔄 Попробовать автоматически снова</button>
+        <button class="btn" style="background: linear-gradient(45deg, #4CAF50, #8BC34A);" 
+                onclick="downloadImage('${dataUrl.replace(/'/g, "\\'")}', 'sudyba-${title}.png')">
+          💾 Сохранить картинку
+        </button>
+        <button class="btn" style="background: linear-gradient(45deg, #ff9800, #ff5722);" 
+                onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n').replace(/'/g, "\\'")}')">
+          📋 Скопировать текст
+        </button>
+        <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
+      `;
     }
 
-    // КОПИРОВАНИЕ ТЕКСТА
+    function downloadImage(dataUrl, filename) {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setTimeout(() => {
+        alert(`✅ Картинка сохранена! Откройте VK и создайте историю.`);
+      }, 500);
+    }
+
     function copyToClipboard(text) {
       const unescapedText = text.replace(/\\n/g, '\n');
       navigator.clipboard.writeText(unescapedText)
-        .then(() => {
-          alert('✅ Текст скопирован в буфер обмена!\n\nТеперь вы можете вставить его в историю VK.');
-        })
-        .catch(err => {
-          console.error('Ошибка копирования:', err);
-          alert('❌ Не удалось скопировать текст. Попробуйте выделить текст вручную.');
-        });
+        .then(() => alert('✅ Текст скопирован!'))
+        .catch(err => alert('❌ Не удалось скопировать'));
     }
 
-    // СИСТЕМНЫЙ ШЕРИНГ (для мобильных)
-    async function shareViaNative() {
-      if (navigator.share) {
-        try {
-          const title = getTitle(document.querySelector('.result').textContent);
-          const shareText = `🔥 Я стал: ${title}!\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}`;
-          
-          await navigator.share({
-            title: 'Мой результат в "Судьба за 10 секунд"',
-            text: shareText,
-            url: `https://vk.com/app${APP_ID}`
-          });
-          
-          alert('✅ Успешно поделились!');
-        } catch (error) {
-          console.log('Ошибка системного шеринга:', error);
-          alert('Не удалось поделиться через системный шеринг.');
-        }
-      } else {
-        alert('Системный шеринг не поддерживается в вашем браузере.');
-      }
-    }
-
-    // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+    // ИНИЦИАЛИЗАЦИЯ
     async function initApp() {
       updateStatus('🔄 Инициализация...');
       
@@ -560,7 +490,6 @@
         try {
           if (window.vkBridge) {
             updateStatus('✅ VK Bridge загружен');
-            
             await window.vkBridge.send('VKWebAppInit', {});
             updateStatus('✅ Приложение готово');
             
@@ -569,27 +498,22 @@
               userId = userInfo.id;
               updateStatus(`👤 Пользователь: ${userInfo.first_name}`);
             } catch (e) {
-              console.log('Не удалось получить информацию о пользователе:', e);
               updateStatus('👤 Анонимный пользователь');
             }
-          } else {
-            updateStatus('⚠️ VK Bridge не загрузился, но игра работает');
           }
           
           showRandomStory();
           
         } catch (error) {
-          console.error('Ошибка инициализации:', error);
-          updateStatus('⚠️ Приложение работает в ограниченном режиме');
+          updateStatus('⚠️ Приложение работает');
           showRandomStory();
         }
       } else {
-        updateStatus('🌐 Режим: Демо (не в VK)');
+        updateStatus('🌐 Режим: Демо');
         showRandomStory();
       }
     }
 
-    // ЗАПУСК ПРИЛОЖЕНИЯ
     document.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
