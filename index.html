@@ -6,20 +6,20 @@
   <meta name="referrer" content="no-referrer">
   <title>Судьба за 10 секунд</title>
   
-  <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com https://sun9-78.userapi.com;
-    script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
-    style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
-    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com https://vkuserimages.com ;
-    connect-src 'self' https://*.vk.com https://api.vk.com https://husia.github.io https://vk.com https://unpkg.com;
-    frame-src 'self' https://*.vk.com https://vk.com;
-    child-src 'self' https://*.vk.com https://vk.com;
-    worker-src 'none';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    upgrade-insecure-requests;
-  ">
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com https://sun9-86.userapi.com https://sun9-4.userapi.com;
+  script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
+  style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
+  img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com https://sun9-86.userapi.com https://sun9-4.userapi.com data:;
+  connect-src 'self' https://*.vk.com https://api.vk.com https://husia.github.io https://vk.com https://unpkg.com;
+  frame-src 'self' https://*.vk.com https://vk.com;
+  child-src 'self' https://*.vk.com https://vk.com;
+  worker-src 'none';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  upgrade-insecure-requests;
+">
   
   <style>
     * {
@@ -517,36 +517,73 @@
       document.getElementById('modal-container').innerHTML = '';
     }
 
-    function showShareModal() {
-      const currentTitle = getTitle(document.querySelector('.result').textContent);
-      const link = isInVK() 
-        ? `https://vk.com/app${APP_ID}?ref=${userId}`
-        : `https://vk.com/app5198765432?ref=demo123`;
-      const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇`;
-      const fullText = `${shareText}\n\n${link}`;
+function showShareModal() {
+  const currentTitle = getTitle(document.querySelector('.result').textContent);
+  const link = isInVK() 
+    ? `https://vk.com/app${APP_ID}?ref=${userId}`
+    : `https://vk.com/app5198765432?ref=demo123`;
+  
+  const stickerText = `🔥 Я стал: ${currentTitle}!`;
+  const actionLink = link;
+  
+  if (isInVK()) {
+    loadVKBridge().then(bridge => {
+      if (!bridge) {
+        showShareModal();
+        return;
+      }
       
-      const modalContainer = document.getElementById('modal-container');
-      modalContainer.innerHTML = `
-        <div class="overlay" onclick="closeErrorModal()"></div>
-        <div class="error-modal">
-          <h3>📱 Как поделиться своей судьбой</h3>
-          <div class="share-instruction">
-            <p>ВКонтакте не позволяет Mini Apps автоматически отправлять сообщения. Но вы можете легко поделиться вручную:</p>
-            <ol>
-              <li>Нажмите кнопку "Скопировать текст"</li>
-              <li>Откройте диалог с другом в ВК</li>
-              <li>Вставьте скопированный текст и отправьте</li>
-            </ol>
-            <div class="link-preview">${fullText}</div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn-copy" onclick="copyShareText('${fullText.replace(/'/g, "\\'")}')">📋 Скопировать текст</button>
-            <button class="btn-close" onclick="closeErrorModal()">Закрыть</button>
-          </div>
+      // Показываем лоадер
+      document.getElementById('game').innerHTML = `
+        <div class="loading" style="margin: 40px 0;">
+          📱 Создаю историю...
         </div>
       `;
-    }
-
+      
+      // СОЗДАЕМ ИСТОРИЮ С ТВОЕЙ ССЫЛКОЙ
+      bridge.send('VKWebAppShowStoryBox', {
+        background_type: 'image',
+        // ТВОЯ ССЫЛКА ДЛЯ ИСТОРИЙ
+        url: 'https://sun9-4.userapi.com/s/v1/ig2/VhFPa-WbwKQ7vBJxNWBWRPVX24livPpD3AbKCFonrnZ7CEeQQtjGkHglBeiS5POyK9Ncjn4OT2JjxPva4NHCQlqc.jpg?quality=95&as=32x57,48x85,72x128,108x192,160x284,240x427,360x640,480x853,540x960,640x1138,720x1280,1080x1920&from=bu&cs=1080x0',
+        sticker: stickerText.substring(0, 35), // Максимум 35 символов
+        action_type: 'link',
+        action_link: actionLink
+      })
+      .then(() => {
+        // Успешно создали историю
+        showErrorModal('✅ Успешно!', 'История создана! Друзья увидят твой результат в своих лентах.');
+        
+        // Через 3 секунды возвращаем игру
+        setTimeout(() => {
+          showRandomStory();
+        }, 3000);
+      })
+      .catch(error => {
+        console.log('Story creation failed:', error);
+        
+        // Если не получилось - показываем ручной способ
+        showErrorModal('📸 Вручную', 'Не получилось создать историю автоматически.\n\nНо ты можешь:\n1. Сделать скриншот этого экрана\n2. Открыть камеры ВК\n3. Выбрать скриншот и опубликовать');
+        
+        // Через 5 секунд показываем кнопки
+        setTimeout(() => {
+          document.getElementById('game').innerHTML = `
+            <div class="result" id="resultBox">
+              ${document.querySelector('.result').innerHTML}
+            </div>
+            <div class="share-instruction" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin: 15px 0;">
+              <p>📸 <b>Совет:</b> Сделай скриншот этого экрана и выложи в историю!</p>
+              <button class="btn btn-share" onclick="showShareModal()">📋 Скопировать текст для подписи</button>
+            </div>
+            <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
+            <button class="btn btn-premium" onclick="showPremium()">💎 Премиум-судьбы</button>
+          `;
+        }, 5000);
+      });
+    });
+  } else {
+    showShareModal();
+  }
+}
     function copyShareText(text) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
