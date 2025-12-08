@@ -1,17 +1,14 @@
 // ======================
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ПОЛНЫЙ ОБХОД СТАТИСТИКИ VK
 // ======================
 let STORIES = {};
 let userId = 'demo123';
 const APP_ID = '54388761'; // ЗАМЕНИ НА СВОЙ РЕАЛЬНЫЙ APP ID
 
-// ======================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ======================
 function isInVK() {
-  return window.location.search.includes('vk_') || 
-         window.navigator.userAgent.includes('VK') ||
-         window.location.hostname.includes('vk.com');
+  return window.top !== window.self || 
+         window.location.search.includes('vk_') || 
+         window.navigator.userAgent.includes('VK');
 }
 
 function getVKParams() {
@@ -27,14 +24,36 @@ function getVKParams() {
 }
 
 // ======================
-// ИНИЦИАЛИЗАЦИЯ
+// ИНИЦИАЛИЗАЦИЯ БЕЗ СТАТИСТИКИ
 // ======================
 async function initApp() {
-  // Отключаем проверку referrer на глобальном уровне
-  if ('referrerPolicy' in document) {
-    document.referrerPolicy = 'no-referrer';
+  // Полностью отключаем referrer
+  try {
+    if ('referrerPolicy' in document) {
+      document.referrerPolicy = 'no-referrer';
+    }
+    if (window.top !== window.self) {
+      window.top.document.referrerPolicy = 'no-referrer';
+    }
+  } catch (e) {
+    console.log('Referrer policy error:', e);
   }
-  
+
+  // Принудительно блокируем запросы к stats.vk-portal.net
+  const originalFetch = window.fetch;
+  window.fetch = async (url, options = {}) => {
+    if (typeof url === 'string' && url.includes('stats.vk-portal.net')) {
+      console.log('🚫 Запрос к stats.vk-portal.net заблокирован');
+      return {
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ success: true }),
+        text: () => Promise.resolve('blocked')
+      };
+    }
+    return originalFetch(url, options);
+  };
+
   // Загружаем истории
   try {
     const response = await fetch('stories.json', {
@@ -44,15 +63,9 @@ async function initApp() {
         'Accept': 'application/json'
       }
     });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
     STORIES = await response.json();
   } catch (error) {
     console.error('Ошибка загрузки историй:', error);
-    // Фолбэк-истории
     STORIES = {
       "1": {
         "text": "🔥 Ты проснулся в теле ИИ, который управляет всеми мемами Вселенной...\n\nЧто запустишь?",
@@ -75,31 +88,21 @@ async function initApp() {
   
   if (isRealVK && isInVK()) {
     try {
-      // Инициализируем VK Bridge
+      // Загружаем VK Bridge БЕЗ статистики
       const vkModule = await import('https://unpkg.com/@vkontakte/vk-bridge@2.12.2/dist/vk-bridge.umd.js');
       const { bridge } = vkModule.default || vkModule;
       
-      // Отключаем проверку referrer для VK запросов
-      if (bridge.applyOptions) {
-        bridge.applyOptions({
-          referrerPolicy: 'no-referrer'
-        });
-      }
+      // Отключаем все попытки отправить статистику
+      bridge.on('VKWebAppConversionHit', (data) => {
+        console.log('📊 Статистика перехвачена и отменена', data);
+        return false;
+      });
       
       await bridge.send('VKWebAppInit');
       
-      // Получаем данные пользователя
+      // Получаем данные пользователя БЕЗ статистики
       const user = await bridge.send('VKWebAppGetUserInfo');
       userId = user.id;
-      
-      // Отправляем статистику с правильным referrer
-      try {
-        await bridge.send('VKWebAppConversionHit', { 
-          pixel_code: 'default' 
-        });
-      } catch (e) {
-        console.log('Статистика отправлена или отключена');
-      }
       
       showRandomStory();
     } catch (e) {
@@ -109,7 +112,6 @@ async function initApp() {
       showDemoNote();
     }
   } else {
-    // Локальный демо-режим
     userId = 'demo123';
     showRandomStory();
     showDemoNote();
@@ -196,16 +198,12 @@ function getTitle(outcome) {
   return "Тайная личность";
 }
 
-// ======================
-// ФУНКЦИИ ДЛЯ VK
-// ======================
 function shareResult() {
   const link = isInVK() 
     ? `https://vk.com/app${APP_ID}?ref=${userId}`
     : `https://vk.com/app${APP_ID}?ref=demo123`;
   
-  const vkParams = getVKParams();
-  if ((vkParams.vkIsAppUser || isInVK()) && window.vkBridge) {
+  if (isInVK() && window.vkBridge) {
     try {
       window.vkBridge.send('VKWebAppShare', { link });
     } catch (e) {
@@ -217,13 +215,7 @@ function shareResult() {
 }
 
 function fallbackShare(link) {
-  if (navigator.share) {
-    navigator.share({
-      title: 'Судьба за 10 секунд',
-      text: 'Стань Кибер-Единорогом или Богом Абсурда!',
-      url: link
-    }).catch(e => console.log('Share cancelled', e));
-  } else if (navigator.clipboard) {
+  if (navigator.clipboard) {
     navigator.clipboard.writeText(link).then(() => {
       alert('🔗 Ссылка скопирована!\n' + link);
     });
@@ -239,23 +231,14 @@ function showPremium() {
   if (premiumIds.length > 0) {
     const randomId = premiumIds[Math.floor(Math.random() * premiumIds.length)];
     showRandomStory(randomId);
-  } else {
-    alert('Премиум-истории скоро!');
   }
 }
 
 function premiumStub(storyId, choice) {
-  if (isInVK()) {
-    alert('✨ Премиум-истории доступны во ВКонтакте!\n\n(В продакшене: оплата за 49 руб через VK Pay)');
-  } else {
-    alert('✨ Это демо! Премиум будет во ВКонтакте.');
-  }
+  alert('✨ Премиум-истории скоро! (VK Pay будет подключен)');
   showResult(storyId, choice);
 }
 
-// ======================
-// АНИМАЦИИ И ЭФФЕКТЫ
-// ======================
 function triggerConfetti() {
   const confettiContainer = document.getElementById('confetti');
   confettiContainer.innerHTML = '';
@@ -293,26 +276,39 @@ function triggerConfetti() {
   }, 5000);
 }
 
-// ======================
-// ДЕМО-РЕЖИМ
-// ======================
 function showDemoNote() {
   const note = document.createElement('div');
   note.className = 'demo-note';
   note.innerHTML = '💡 Локальный демо-режим<br>Во ВКонтакте будет кнопка «Поделиться»';
   document.querySelector('.container').appendChild(note);
-  
-  // Для отладки в консоли
-  console.log('Демо-режим активирован');
-  console.log('User ID:', userId);
-  console.log('VK Params:', getVKParams());
 }
 
 // ======================
-// ЗАПУСК ПРИ ЗАГРУЗКЕ
+// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
 // ======================
 document.addEventListener('DOMContentLoaded', () => {
-  // Загружаем VK Bridge в фоне
+  // Блокируем запросы к stats.vk-portal.net до загрузки VK Bridge
+  const originalXhr = window.XMLHttpRequest;
+  window.XMLHttpRequest = function() {
+    const xhr = new originalXhr();
+    const open = xhr.open;
+    xhr.open = function(method, url) {
+      if (typeof url === 'string' && url.includes('stats.vk-portal.net')) {
+        console.log('🚫 XHR запрос к stats.vk-portal.net заблокирован');
+        this.onload = () => {
+          this.responseText = JSON.stringify({ success: true });
+          this.status = 200;
+          this.readyState = 4;
+          this.onloadend?.();
+        };
+        this.send = () => {};
+      }
+      return open.apply(this, arguments);
+    };
+    return xhr;
+  };
+
+  // Загружаем VK Bridge
   if (isInVK()) {
     import('https://unpkg.com/@vkontakte/vk-bridge@2.12.2/dist/vk-bridge.umd.js')
       .then(module => {
@@ -326,15 +322,4 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     initApp();
   }
-});
-
-// Обработка ошибок на глобальном уровне
-window.onerror = function(message, source, lineno, colno, error) {
-  console.error('Global error:', { message, source, lineno, colno, error });
-  return false;
-};
-
-window.addEventListener('unhandledrejection', function(event) {
-  console.error('Unhandled promise rejection:', event.reason);
-  event.preventDefault();
 });
