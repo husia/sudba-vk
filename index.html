@@ -7,10 +7,10 @@
   <title>Судьба за 10 секунд</title>
   
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com;
+    default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com;
     script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
     style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
-    img-src 'self'  https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com;
+    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com data:;
     connect-src 'self' https://*.vk.com https://api.vk.com https://husia.github.io https://vk.com;
     frame-src 'self' https://*.vk.com https://vk.com;
     child-src 'self' https://*.vk.com https://vk.com;
@@ -102,8 +102,13 @@
       transform: translateY(-50%);
     }
     .btn-share {
-      background: linear-gradient(45deg, #43e97b, #38f9d7);
-      color: #0a3d30;
+      background: linear-gradient(45deg, #ff416c, #ff4b2b);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
+    }
+    .btn-share:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(255, 75, 43, 0.6);
     }
     .result {
       background: rgba(0,0,0,0.25);
@@ -181,8 +186,8 @@
 
   <script>
     // 100% РАБОЧЕЕ РЕШЕНИЕ ДЛЯ 403 И 404 ОШИБОК
-    // Блокируем все запросы к stats.vk-portal.net
     (function() {
+      // Блокируем все запросы к stats.vk-portal.net
       const originalFetch = window.fetch;
       window.fetch = async (url, options = {}) => {
         if (typeof url === 'string' && url.includes('stats.vk-portal.net')) {
@@ -197,7 +202,7 @@
         return originalFetch(url, options);
       };
       
-      // Блокируем XHR запросы
+      // Блокируем XHR запросы к stats
       const originalXhr = window.XMLHttpRequest;
       window.XMLHttpRequest = function() {
         const xhr = new originalXhr();
@@ -245,6 +250,45 @@
           }
         }
       },
+      "3": {
+        "text": "🐱 Твой кот говорит: «Я — шпион». Ты...",
+        "options": {
+          "A": {
+            "outcome": "🕶️ ТЫ СТАЛ: КОТО-АГЕНТОМ\n\nТеперь вы в паре. Ваша миссия — украсть\nвсе вкусняшки в округе. Успех: 100%.\n\n🐟 Уровень секретности: 99/100",
+            "premium": false
+          },
+          "B": {
+            "outcome": "👑 ТЫ СТАЛ: СЛУГОЙ КОРОЛЯ\n\nПризнал власть кота. Теперь носишь корону\nиз пивных крышек. Честь: максимальна.\n\n👑 Уровень подчинения: 100/100",
+            "premium": false
+          }
+        }
+      },
+      "4": {
+        "text": "☕ Утром вместо кофе ты нашёл...?",
+        "options": {
+          "A": {
+            "outcome": "🧪 ТЫ СТАЛ: МЕМ-ПРОРОКОМ\n\nНапиток даёт способность предсказывать мемы.\nТы знал про «танцующего Путина» за неделю.\n\n🔮 Уровень пророчества: 96/100",
+            "premium": false
+          },
+          "B": {
+            "outcome": "🪄 ТЫ СТАЛ: ВОЛШЕБНОЙ ЧАШКОЙ\n\nТвоя чашка отвечает на все вопросы.\nНо только мемами. Мудрость: бесценна.\n\n🤣 Уровень юмора: 99/100",
+            "premium": false
+          }
+        }
+      },
+      "5": {
+        "text": "🎭 Ты можешь стереть один мем из истории. Какой?",
+        "options": {
+          "A": {
+            "outcome": "🗑️ ТЫ СТАЛ: ОСВОБОДИТЕЛЕМ КОТОВ\n\nУдалил «Кот с огурцом». Коты больше не боятся.\nОни построили тебе памятник из вискаса.\n\n😻 Уровень добра: 92/100",
+            "premium": false
+          },
+          "B": {
+            "outcome": "🔥 ТЫ СТАЛ: ВОССТАНОВИТЕЛЕМ ПРАВДЫ\n\nУдалил «Это не я, это мой брат».\nТеперь все честны. Мир стал скучным, но чистым.\n\n🕊️ Уровень правды: 100/100",
+            "premium": false
+          }
+        }
+      },
       "101": {
         "text": "✨ Ты — создатель новой Вселенной. Какой закон физики отменишь?",
         "options": {
@@ -262,13 +306,15 @@
 
     // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     let userId = 'demo123';
-    const APP_ID = '54388761'; // ЗАМЕНИ НА СВОЙ РЕАЛЬНЫЙ APP ID
+    const APP_ID = '5198765432'; // ЗАМЕНИ НА СВОЙ РЕАЛЬНЫЙ APP ID
 
     // ФУНКЦИИ
     function isInVK() {
-      return window.top !== window.self || 
-             window.location.search.includes('vk_') || 
-             window.navigator.userAgent.includes('VK');
+      const isWebView = window.navigator.userAgent.includes('VK');
+      const hasVKParams = window.location.search.includes('vk_');
+      const isVKDomain = window.location.hostname.includes('vk.com');
+      
+      return isWebView || hasVKParams || isVKDomain;
     }
 
     function getVKParams() {
@@ -309,11 +355,22 @@
     function showResult(storyId, choice) {
       const outcome = STORIES[storyId].options[choice].outcome;
       
-      const friends = "@ivan → 'Кот-хакер'\n@maria → 'ИИ-бариста'";
-      const rarity = outcome.includes("999/100") || outcome.includes("MAX") ? "Легендарная" : "Эпическая";
+      const friendsList = [
+        "@ivan → 'Кот-хакер'",
+        "@maria → 'ИИ-бариста'",
+        "@petr → 'Президент Марса'",
+        "@lena → 'Нейро-шаман'",
+        "@barsik → 'Тайный агент'"
+      ];
+      const shuffled = [...friendsList].sort(() => 0.5 - Math.random());
+      const friends = shuffled.slice(0, 2).join('\n');
+      
+      let rarity = "Обычная";
+      if (outcome.includes("999/100") || outcome.includes("MAX")) rarity = "Легендарная";
+      else if (outcome.includes("9")) rarity = "Эпическая";
       
       const resultHtml = `
-        <div class="result">
+        <div class="result" id="resultBox">
           ${outcome}
           <div class="rarity">💎 Редкость: ${rarity}</div>
         </div>
@@ -344,42 +401,66 @@
     function shareResult() {
       const link = isInVK() 
         ? `https://vk.com/app${APP_ID}?ref=${userId}`
-        : `https://vk.com/app5198765432?ref=demo123`;
+        : `https://vk.com/app${APP_ID}?ref=demo123`;
       
-      // Используем нативный share API для демо-режима
-      if (!isInVK()) {
-        if (navigator.share) {
-          navigator.share({
-            title: 'Судьба за 10 секунд',
-            text: 'Узнай свою судьбу!',
-            url: link
-          });
-        } else {
-          navigator.clipboard.writeText(link).then(() => {
-            alert('🔗 Ссылка скопирована!\n' + link);
-          });
-        }
-        return;
-      }
+      const message = `🔥 Я стал: ${getTitle(document.querySelector('.result').textContent)}!\n\nУзнай свою судьбу за 10 секунд 👇`;
       
-      // Для VK загружаем bridge динамически и делимся
-      loadVKBridge().then(bridge => {
-        if (bridge) {
-          bridge.send('VKWebAppShare', { link }).catch(e => {
-            console.log('Share error:', e);
-            // Fallback если не работает
-            navigator.clipboard.writeText(link).then(() => {
-              alert('🔗 Ссылка скопирована!\n' + link);
+      if (isInVK()) {
+        loadVKBridge().then(bridge => {
+          if (!bridge) return fallbackShare(link, message);
+          
+          // Способ 1: Диалог шеринга (самый надёжный)
+          bridge.send('VKWebAppShare', {
+            link: link,
+            comment: message
+          }).catch(e => {
+            console.log('Share dialog failed, trying story box:', e);
+            
+            // Способ 2: Открыть историю (если шеринг не сработал)
+            bridge.send('VKWebAppShowStoryBox', {
+              background_type: 'image',
+              url: 'https://i.imgur.com/5XJmR9L.png',
+              sticker: '🔥 Я стал: ' + getTitle(document.querySelector('.result').textContent) + '!',
+              action_type: 'link',
+              action_link: link
+            }).catch(e => {
+              console.log('Story box failed, trying wall post:', e);
+              
+              // Способ 3: Открыть пост на стене
+              bridge.send('VKWebAppOpenWallPost', {
+                owner_id: userId,
+                message: message + '\n\n' + link
+              }).catch(e => {
+                console.log('All methods failed, using fallback:', e);
+                fallbackShare(link, message);
+              });
             });
           });
-        }
-      }).catch(e => {
-        console.log('VK Bridge error:', e);
-        // Fallback
-        navigator.clipboard.writeText(link).then(() => {
-          alert('🔗 Ссылка скопирована!\n' + link);
         });
-      });
+      } else {
+        fallbackShare(link, message);
+      }
+    }
+
+    function fallbackShare(link, message) {
+      // Создаём красивый текст для копирования
+      const text = `${message}\n\n${link}`;
+      
+      if (navigator.share) {
+        // Нативный шеринг в мобильных браузерах
+        navigator.share({
+          title: 'Судьба за 10 секунд',
+          text: text
+        }).catch(e => console.log('Share cancelled', e));
+      } else if (navigator.clipboard) {
+        // Копирование в буфер обмена
+        navigator.clipboard.writeText(text).then(() => {
+          alert('🎯 Отлично! Скопируй текст и отправь другу:\n\n' + text);
+        });
+      } else {
+        // Старый метод
+        prompt('Скопируй ссылку и отправь другу:', text);
+      }
     }
 
     function showPremium() {
@@ -387,7 +468,8 @@
         Object.values(STORIES[id].options).some(opt => opt.premium)
       );
       if (premiumIds.length > 0) {
-        showRandomStory(premiumIds[0]);
+        const randomId = premiumIds[Math.floor(Math.random() * premiumIds.length)];
+        showRandomStory(randomId);
       }
     }
 
@@ -448,25 +530,33 @@
           return;
         }
         
-        // Создаем скрипт для загрузки правильной версии VK Bridge
+        // Проверяем, запущено ли приложение во ВКонтакте
+        if (!isInVK()) {
+          console.log('✅ Не во ВКонтакте, пропускаем загрузку bridge');
+          resolve(null);
+          return;
+        }
+        
+        // Создаём скрипт для загрузки VK Bridge
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js';
         script.async = true;
         script.onload = () => {
           if (window.vkBridge) {
             // Отключаем статистику
-            window.vkBridge.on && window.vkBridge.on('VKWebAppConversionHit', (data) => {
-              console.log('📊 Статистика отключена');
-              return false;
-            });
-            
+            if (window.vkBridge.on) {
+              window.vkBridge.on('VKWebAppConversionHit', (data) => {
+                console.log('📊 Статистика отключена');
+                return false;
+              });
+            }
             resolve(window.vkBridge);
           } else {
             resolve(null);
           }
         };
         script.onerror = () => {
-          console.log('✅ VK Bridge не загружен (демо-режим)');
+          console.log('✅ VK Bridge не загружен (ошибка загрузки)');
           resolve(null);
         };
         
@@ -489,8 +579,9 @@
             try {
               const user = await bridge.send('VKWebAppGetUserInfo');
               userId = user.id || 'vk_user';
+              console.log('✅ VK Bridge инициализирован, пользователь:', userId);
             } catch (e) {
-              console.log('Пользователь не авторизован, используем демо ID');
+              console.log('Пользователь не авторизован, используем демо ID', e);
               userId = 'demo_vk_user';
             }
           }
@@ -505,7 +596,14 @@
     }
 
     // ЗАПУСК
-    document.addEventListener('DOMContentLoaded', initApp);
+    document.addEventListener('DOMContentLoaded', () => {
+      // Проверка статуса VK
+      console.log('✅ Технические работы во ВКонтакте, но игра работает в демо-режиме');
+      console.log('✅ Адрес приложения: https://husia.github.io/sudba-vk/');
+      
+      // Запускаем инициализацию
+      initApp();
+    });
   </script>
 </body>
 </html>
