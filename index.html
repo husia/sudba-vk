@@ -17,7 +17,7 @@
     }
     body {
       font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
       min-height: 100vh;
       padding: 20px;
       color: white;
@@ -26,230 +26,149 @@
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(15px);
-      border-radius: 28px;
-      padding: 28px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.2);
     }
     h1 {
-      font-size: 32px;
-      margin-bottom: 24px;
-      text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
       animation: pulse 2s infinite;
-      background: linear-gradient(45deg, #FFD700, #FFA500);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
     @keyframes pulse {
       0% { transform: scale(1); }
-      50% { transform: scale(1.04); }
+      50% { transform: scale(1.03); }
       100% { transform: scale(1); }
     }
     .story-box {
-      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
-      border-radius: 20px;
-      padding: 24px;
-      margin: 24px 0;
-      font-size: 20px;
-      line-height: 1.6;
+      background: rgba(0,0,0,0.2);
+      border-radius: 18px;
+      padding: 20px;
+      margin: 20px 0;
+      font-size: 18px;
+      line-height: 1.5;
       white-space: pre-wrap;
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px dashed rgba(255,255,255,0.3);
     }
     .btn {
       display: block;
       width: 100%;
-      padding: 18px;
-      margin: 16px 0;
+      padding: 16px;
+      margin: 12px 0;
       border: none;
-      border-radius: 18px;
-      font-size: 19px;
-      font-weight: 800;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.2s;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      letter-spacing: 1px;
     }
     .btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
     }
-    .btn:active {
-      transform: translateY(-2px);
+    .btn-free {
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+      color: #8b4513;
     }
-    .btn-choice {
-      background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-      color: white;
-    }
-    .btn-choice:hover {
-      background: linear-gradient(45deg, #FF5252, #FF7B3A);
-    }
-    .btn-share {
-      background: linear-gradient(45deg, #FF416C, #FF4B2B);
-      color: white;
-      box-shadow: 0 8px 25px rgba(255, 65, 108, 0.4);
-    }
-    .btn-share:hover {
-      background: linear-gradient(45deg, #FF2B60, #FF3A1A);
-      box-shadow: 0 12px 30px rgba(255, 65, 108, 0.6);
-    }
-    .btn-vip {
-      background: linear-gradient(45deg, #FFD700, #FFA500);
-      color: #8B4513;
+    .btn-premium {
+      background: linear-gradient(45deg, #a1c4fd, #c2e9fb);
+      color: #2c3e50;
       position: relative;
+      overflow: hidden;
     }
-    .btn-vip::after {
-      content: "✨";
+    .btn-premium::after {
+      content: "💎";
       position: absolute;
-      right: 20px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 24px;
     }
-    .btn-vip:hover {
-      background: linear-gradient(45deg, #FFC800, #FF9500);
-    }
-    .btn-download {
-      background: linear-gradient(45deg, #4CAF50, #2E7D32);
+    .btn-share {
+      background: linear-gradient(45deg, #ff416c, #ff4b2b);
       color: white;
+      box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
     }
-    .btn-download:hover {
-      background: linear-gradient(45deg, #43A047, #1B5E20);
-    }
-    .btn-copy {
-      background: linear-gradient(45deg, #9C27B0, #673AB7);
-      color: white;
-    }
-    .btn-copy:hover {
-      background: linear-gradient(45deg, #8E24AA, #5E35B1);
+    .btn-share:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(255, 75, 43, 0.6);
     }
     .result {
-      background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.1));
-      border-radius: 22px;
-      padding: 28px;
-      margin: 28px 0;
-      font-size: 20px;
-      line-height: 1.7;
-      border: 2px solid #FFD700;
-      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.25);
-      animation: fadeIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      background: rgba(0,0,0,0.25);
+      border-radius: 20px;
+      padding: 24px;
+      margin: 24px 0;
+      font-size: 18px;
+      line-height: 1.6;
+      border: 2px solid #ffcc00;
+      animation: fadeIn 0.6s ease-out;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .rarity {
       display: inline-block;
-      margin-top: 15px;
-      padding: 8px 20px;
-      border-radius: 25px;
-      font-size: 16px;
-      font-weight: 800;
-      background: linear-gradient(45deg, #FF416C, #FF4B2B);
-      color: white;
-      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      background: rgba(255,255,255,0.2);
+    }
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0;
     }
     .footer {
-      margin-top: 25px;
-      font-size: 15px;
-      opacity: 0.9;
-      color: rgba(255,255,255,0.8);
+      margin-top: 20px;
+      font-size: 14px;
+      opacity: 0.8;
     }
     .loading {
-      font-size: 22px;
-      margin: 45px 0;
-      animation: pulse 1.8s infinite;
-      color: #FFD700;
+      font-size: 20px;
+      margin: 40px 0;
+      animation: pulse 1.5s infinite;
     }
     .status {
-      margin-top: 25px;
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .error {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
       padding: 15px;
-      background: rgba(0,0,0,0.25);
-      border-radius: 14px;
-      font-size: 15px;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .warning {
-      background: linear-gradient(135deg, rgba(255, 165, 0, 0.25), rgba(255, 193, 7, 0.15));
-      border: 2px solid #FF9800;
-      border-radius: 16px;
-      padding: 20px;
+      border-radius: 12px;
       margin: 20px 0;
-      text-align: left;
-    }
-    .warning-title {
-      color: #FFD700;
-      font-weight: 800;
-      font-size: 18px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .warning-title::before {
-      content: "⚠️";
-      font-size: 24px;
-    }
-    .instructions {
-      background: linear-gradient(135deg, rgba(76, 175, 80, 0.25), rgba(139, 195, 74, 0.15));
-      border: 2px solid #4CAF50;
-      border-radius: 16px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .instructions-title {
-      color: #C8E6C9;
-      font-weight: 800;
-      font-size: 18px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .instructions-title::before {
-      content: "📱";
-      font-size: 24px;
-    }
-    .result-image {
-      width: 100%;
-      border-radius: 18px;
-      margin: 20px 0;
-      border: 3px solid rgba(255,255,255,0.3);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease;
-      cursor: pointer;
-    }
-    .result-image:hover {
-      transform: scale(1.02);
-    }
-    .emoji-badge {
-      display: inline-block;
-      font-size: 28px;
-      margin: 0 8px;
-      vertical-align: middle;
-      animation: bounce 2s infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1><span class="emoji-badge">🔥</span> СУДЬБА ЗА 10 СЕКУНД <span class="emoji-badge">✨</span></h1>
+    <h1>🔥 Судьба за 10 секунд</h1>
     <div id="game">
-      <div class="loading">✨ Магия загружается...</div>
+      <div class="loading">✨ Загрузка...</div>
     </div>
     <div id="status" class="status"></div>
-    <div class="footer">Создано с безумием и любовью ❤️ | Твоя судьба ждёт!</div>
+    <div class="footer">Создано с абсурдом и любовью ❤️</div>
   </div>
+
+  <div class="confetti" id="confetti"></div>
+  <div id="modal-container"></div>
 
   <script>
     // ИСТОРИИ
@@ -282,10 +201,14 @@
       }
     };
 
+    // КОНСТАНТЫ
+    const BACKGROUND_IMAGE_URL = "https://sun9-4.userapi.com/s/v1/ig2/VhFPa-WbwKQ7vBJxNWBWRPVX24livPpD3AbKCFonrnZ7CEeQQtjGkHglBeiS5POyK9Ncjn4OT2JjxPva4NHCQlqc.jpg";
+    const APP_ID = '54388761';
+
     // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     let userId = 'demo123';
-    const APP_ID = '54388761';
     let isSharing = false;
+    let currentResult = null;
 
     // ФУНКЦИИ
     function isInVK() {
@@ -293,17 +216,6 @@
       return params.has('vk_user_id') || 
              navigator.userAgent.includes('VK') || 
              window.location.hostname.includes('vk.com');
-    }
-
-    // Проверяем мобильное приложение VK
-    function isMobileVK() {
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isMobile = /mobile|android|iphone|ipad|ipod/.test(userAgent);
-      const isVK = /vk/.test(userAgent) || window.location.hostname.includes('vk.com');
-      const params = new URLSearchParams(window.location.search);
-      const hasVKParams = params.has('vk_user_id');
-      
-      return isMobile && isVK && hasVKParams;
     }
 
     function updateStatus(text) {
@@ -327,342 +239,246 @@
       
       for (const key in story.options) {
         const opt = story.options[key];
-        html += `<button class="btn btn-choice" onclick="showResult('${storyId}', '${key}')">${key}</button>`;
+        html += `<button class="btn btn-free" onclick="showResult('${storyId}', '${key}')">${key}</button>`;
       }
       
       document.getElementById('game').innerHTML = html;
-      updateStatus('🎯 Выбери свою судьбу!');
     }
 
     function showResult(storyId, choice) {
       const outcome = STORIES[storyId].options[choice].outcome;
-      const title = getTitle(outcome);
+      currentResult = outcome;
       
       const resultHtml = `
         <div class="result" id="resultBox">
           ${outcome}
-          <div class="rarity">⚡ РЕДКОСТЬ: ЛЕГЕНДАРНАЯ</div>
+          <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
-        <div class="instructions">
-          <div class="instructions-title">🎉 Твоя судьба определена!</div>
-          Поделись результатом с друзьями — пусть они тоже узнают свою судьбу!
-        </div>
-        <button class="btn btn-share" onclick="createAndShareStory()">
-          📲 Поделиться в историях
-        </button>
-        <button class="btn btn-vip" onclick="showRandomStory()">
-          🔄 Узнать другую судьбу
-        </button>
+        <button class="btn btn-share" onclick="shareToVKStory()">📲 Поделиться в историях</button>
+        <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
       `;
       
       document.getElementById('game').innerHTML = resultHtml;
-      updateStatus('✨ Твоя судьба раскрыта!');
     }
 
     function getTitle(outcome) {
       const lines = outcome.split('\n');
       for (let line of lines) {
         if (line.includes("ТЫ СТАЛ: ")) {
-          return line.split("ТЫ СТАЛ: ")[1].replace(/[💎🏆🌀✨💥🕊️🚀📡]/g, '').trim();
+          return line.split("ТЫ СТАЛ: ")[1].replace(/[💎🏆🌀✨]/g, '').trim();
         }
       }
-      return "ТАЙНАЯ ЛИЧНОСТЬ";
+      return "Тайная личность";
     }
 
-    // СОЗДАНИЕ КАРТИНКИ ДЛЯ VK
-    function createStoryImage() {
-      return new Promise((resolve) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1080;
-        canvas.height = 1920;
-        const ctx = canvas.getContext('2d');
-        
-        // Градиентный фон
-        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        gradient.addColorStop(0, '#6a11cb');
-        gradient.addColorStop(1, '#2575fc');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Текст
-        const outcome = document.querySelector('.result').textContent;
-        const title = getTitle(outcome);
-        
-        // Заголовок
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 120px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        ctx.fillText('🔥', canvas.width / 2, 250);
-        ctx.font = 'bold 80px Arial';
-        ctx.fillText('СУДЬБА', canvas.width / 2, 400);
-        ctx.fillText('ЗА 10 СЕКУНД', canvas.width / 2, 500);
-        
-        // Результат
-        ctx.font = 'bold 70px Arial';
-        ctx.fillStyle = '#ffcc00';
-        ctx.fillText('ТЫ СТАЛ:', canvas.width / 2, 700);
-        
-        ctx.font = 'bold 100px Arial';
-        ctx.fillStyle = '#ff416c';
-        ctx.fillText(title.toUpperCase(), canvas.width / 2, 850);
-        
-        // Основной текст
-        ctx.font = '45px Arial';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        
-        const lines = outcome.split('\n').filter(line => 
-          line.trim() !== '' && 
-          !line.includes('ТЫ СТАЛ:') && 
-          !line.includes('РЕДКОСТЬ:')
-        );
-        
-        let yPos = 1050;
-        for (let i = 0; i < Math.min(4, lines.length); i++) {
-          ctx.fillText(lines[i], canvas.width / 2, yPos);
-          yPos += 70;
-        }
-        
-        // Ссылка на приложение
-        ctx.font = 'bold 50px Arial';
-        ctx.fillStyle = '#4CAF50';
-        ctx.fillText('Узнай свою судьбу!', canvas.width / 2, 1700);
-        
-        ctx.font = '40px Arial';
-        ctx.fillStyle = '#4CAF50';
-        ctx.fillText('vk.com/app' + APP_ID, canvas.width / 2, 1800);
-        
-        // Создаем Data URL для скачивания
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-        resolve(dataUrl);
-      });
-    }
-
-    // ОСНОВНАЯ ФУНКЦИЯ ШЕРИНГА
-    async function createAndShareStory() {
+    // ГЛАВНАЯ ФУНКЦИЯ ШЕРИНГА В ИСТОРИИ
+    async function shareToVKStory() {
       if (isSharing) return;
       isSharing = true;
       
-      updateStatus('🎨 Создаю картинку...');
+      updateStatus('🔄 Подготавливаю историю...');
       
       try {
-        // Создаем картинку
-        const imageDataUrl = await createStoryImage();
-        
-        // Проверяем, находимся ли мы в мобильном VK
-        const mobileVK = isMobileVK();
-        
-        if (mobileVK && window.vkBridge) {
-          // Для мобильного VK пробуем автоматический способ
-          updateStatus('📱 Пробую автоматическое создание...');
-          
-          // ВАЖНО: VKWebAppShowStoryBox требует URL к изображению
-          // В мини-приложениях нужно загружать изображение на сервер
-          // Но мы можем попробовать использовать Data URL
-          
-          try {
-            await window.vkBridge.send('VKWebAppInit', {});
-            
-            // Пробуем отправить Data URL
-            const result = await window.vkBridge.send('VKWebAppShowStoryBox', {
-              background_type: 'image',
-              url: imageDataUrl, // Пробуем передать Data URL
-              attachment: {
-                text: 'play',
-                type: 'url',
-                url: `https://vk.com/app${APP_ID}`
-              }
-            });
-            
-            if (result && result.result) {
-              updateStatus('✅ История создана! Проверь свои истории ВКонтакте.');
-              setTimeout(() => {
-                showRandomStory();
-                updateStatus('');
-              }, 2000);
-              return;
-            }
-          } catch (vkError) {
-            console.log('VK автоматический способ не сработал:', vkError);
-            updateStatus('⚠️ Автоматически не вышло, используй ручной способ');
-          }
+        // Проверяем VK Bridge
+        if (!window.vkBridge) {
+          throw new Error('VK Bridge не загружен');
         }
         
-        // Для ПК или если автоматический способ не сработал
-        updateStatus('💾 Сохраняю картинку...');
+        // Инициализируем
+        await window.vkBridge.send('VKWebAppInit', {});
+        updateStatus('✅ VK Bridge инициализирован');
         
-        const title = getTitle(document.querySelector('.result').textContent);
-        const filename = `моя-судьба-${title.replace(/\s+/g, '-')}.jpg`;
+        // Получаем результат
+        const outcome = currentResult;
+        const title = getTitle(outcome);
         
-        // Скачиваем картинку
-        downloadImage(imageDataUrl, filename);
+        // Формируем текст для истории
+        const storyText = `🔥 ${title}\n\nУзнай свою судьбу!\n#СудьбаЗа10секунд`;
         
-        updateStatus('✅ Картинка сохранена! Добавь её в истории VK вручную.');
+        // Подготавливаем данные для VKWebAppShowStoryBox
+        const storyData = {
+          background_type: 'image',
+          url: BACKGROUND_IMAGE_URL,
+          attachment: {
+            text: storyText,
+            type: 'url',
+            url: `https://vk.com/app${APP_ID}`
+          },
+          stickers: [
+            {
+              sticker_type: 'renderable',
+              sticker: {
+                content_type: 'text',
+                text: '🎯 Мой результат!',
+                style: {
+                  font_style: 'title',
+                  text_color: '#FFFFFF',
+                  background_color: '#FF416C'
+                },
+                coordinates: [0.5, 0.9], // Нижняя часть
+                height: 0.1,
+                width: 0.8
+              }
+            },
+            {
+              sticker_type: 'renderable',
+              sticker: {
+                content_type: 'text',
+                text: '👉 Жми, чтобы узнать свою судьбу',
+                style: {
+                  font_style: 'body',
+                  text_color: '#FFD700',
+                  background_color: 'transparent'
+                },
+                coordinates: [0.5, 0.95], // Еще ниже
+                height: 0.08,
+                width: 0.9
+              }
+            }
+          ]
+        };
         
-        // Показываем текст для поста
-        const shareText = `🔥 Я стал: ${title}!\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}\n\n#СудьбаЗа10Секунд #VKМиниПриложение`;
+        updateStatus('🔄 Создаю историю...');
         
-        setTimeout(() => {
-          showManualInstructions(imageDataUrl, shareText, title);
-        }, 1000);
+        // Вызываем метод создания истории
+        const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyData);
+        
+        console.log('Story result:', result);
+        
+        if (result && result.result) {
+          updateStatus('✅ История создана!');
+          setTimeout(() => {
+            alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.');
+            showRandomStory();
+            updateStatus('');
+          }, 1000);
+        } else {
+          throw new Error('Пользователь отменил создание истории');
+        }
         
       } catch (error) {
-        console.error('Ошибка:', error);
-        updateStatus('❌ Что-то пошло не так...');
+        console.error('Ошибка создания истории:', error);
         
-        // Показываем ручной способ как fallback
-        try {
-          const imageDataUrl = await createStoryImage();
-          const title = getTitle(document.querySelector('.result').textContent);
-          const shareText = `🔥 Я стал: ${title}!\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}\n\n#СудьбаЗа10Секунд #VKМиниПриложение`;
-          
-          showManualInstructions(imageDataUrl, shareText, title);
-        } catch (e) {
-          updateStatus('❌ Не удалось создать картинку');
+        let errorMessage = 'Не удалось создать историю';
+        if (error.error_message) {
+          errorMessage = error.error_message;
+        } else if (error.message) {
+          errorMessage = error.message;
         }
+        
+        updateStatus(`❌ ${errorMessage}`);
+        
+        // Показываем подробную информацию об ошибке
+        showErrorDetails(error);
         
       } finally {
         isSharing = false;
       }
     }
 
-    // ФУНКЦИЯ СКАЧИВАНИЯ КАРТИНКИ
-    function downloadImage(dataUrl, filename) {
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Мобильное уведомление
-      if (/mobile|android|iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())) {
-        setTimeout(() => {
-          alert('✅ Картинка сохранена в галерею!\n\nТеперь открой VK → Создать историю → Добавь эту картинку');
-        }, 500);
-      }
-    }
-
-    // РУЧНОЙ СПОСОБ
-    function showManualInstructions(imageDataUrl, shareText, title) {
-      const outcome = document.querySelector('.result').textContent;
+    function showErrorDetails(error) {
+      const outcome = currentResult;
+      const title = getTitle(outcome);
+      const shareText = `🔥 Я стал: ${title}!\n\n${outcome}\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}`;
       
       document.getElementById('game').innerHTML = `
         <div class="result" id="resultBox">
           ${outcome}
-          <div class="rarity">⚡ РЕДКОСТЬ: ЛЕГЕНДАРНАЯ</div>
+          <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
         
-        ${isMobileVK() ? `
-          <div class="warning">
-            <div class="warning-title">📱 Автоматически не вышло? Не беда!</div>
-            Используй этот способ — он тоже супер-эффективный!
+        <div class="error">
+          <h3>⚠️ Автоматическое создание не сработало</h3>
+          <p>${error.message || 'Неизвестная ошибка'}</p>
+          <p><small>Попробуйте поделиться вручную:</small></p>
+        </div>
+        
+        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 16px; margin: 20px 0;">
+          <h3 style="color: #ffd700; margin-bottom: 15px;">📱 Как поделиться вручную</h3>
+          
+          <p><strong>1. Откройте ВКонтакте на телефоне</strong></p>
+          <p><strong>2. Нажмите "Создать историю"</strong></p>
+          <p><strong>3. Выберите фон:</strong></p>
+          <img src="${BACKGROUND_IMAGE_URL}" style="width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid rgba(255,255,255,0.3);">
+          
+          <p><strong>4. Добавьте текст:</strong></p>
+          <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-size: 14px; text-align: left;">
+            ${shareText}
           </div>
-        ` : `
-          <div class="instructions">
-            <div class="instructions-title">🎬 Создай эпическую историю!</div>
-            Сохрани эту крутую картинку и опубликуй её в своих историях VK!
+          
+          <p><strong>5. Добавьте ссылку:</strong></p>
+          <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace;">
+            https://vk.com/app${APP_ID}
           </div>
-        `}
-        
-        <p><strong>Твоя уникальная картинка:</strong></p>
-        <img src="${imageDataUrl}" class="result-image" 
-             onclick="downloadImage('${imageDataUrl.replace(/'/g, "\\'")}', 'моя-судьба-${title}.jpg')">
-        
-        <p style="margin: 15px 0;"><strong>Текст для истории:</strong></p>
-        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
-          ${shareText}
         </div>
         
-        <div style="margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-          <p><em>📝 Как опубликовать:</em></p>
-          <p>1. Сохрани картинку<br>2. Открой VK<br>3. Нажми «Создать историю»<br>4. Добавь картинку и опубликуй!</p>
-        </div>
-        
-        <button class="btn btn-download" 
-                onclick="downloadImage('${imageDataUrl.replace(/'/g, "\\'")}', 'моя-судьба-${title}.jpg')">
-          💾 Сохранить картинку
-        </button>
-        
-        <button class="btn btn-copy" 
+        <button class="btn btn-share" onclick="shareToVKStory()">🔄 Попробовать снова</button>
+        <button class="btn" style="background: linear-gradient(45deg, #4CAF50, #8BC34A);" 
                 onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n').replace(/'/g, "\\'")}')">
-          📋 Скопировать текст
+          📋 Скопировать текст для поста
         </button>
-        
-        ${isMobileVK() && window.vkBridge ? `
-          <button class="btn btn-share" onclick="createAndShareStory()">
-            🔄 Попробовать автоматически снова
-          </button>
-        ` : ''}
-        
-        <button class="btn btn-vip" onclick="showRandomStory()">
-          🎭 Узнать другую судьбу
-        </button>
+        <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
       `;
     }
 
     function copyToClipboard(text) {
       const unescapedText = text.replace(/\\n/g, '\n');
       navigator.clipboard.writeText(unescapedText)
-        .then(() => {
-          alert('✅ Текст скопирован! Теперь вставь его в свою историю VK!');
-        })
-        .catch(err => {
-          // Фолбэк для старых браузеров
-          const textArea = document.createElement('textarea');
-          textArea.value = unescapedText;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-          alert('✅ Текст скопирован! Вставь его в историю VK!');
-        });
+        .then(() => alert('✅ Текст скопирован в буфер обмена!'))
+        .catch(err => alert('❌ Не удалось скопировать'));
     }
 
     // ИНИЦИАЛИЗАЦИЯ
     async function initApp() {
-      updateStatus('🔮 Загружаю магию судьбы...');
+      updateStatus('🔄 Инициализация...');
       
-      // Проверяем окружение
-      const inVK = isInVK();
-      const mobileVK = isMobileVK();
-      
-      if (inVK) {
-        updateStatus('✅ ВКонтакте обнаружен!');
-        
-        if (mobileVK) {
-          updateStatus('📱 Мобильное приложение VK');
-        } else {
-          updateStatus('💻 Веб-версия или ПК');
-        }
+      if (isInVK()) {
+        updateStatus('✅ Обнаружен VK');
         
         try {
           if (window.vkBridge) {
+            updateStatus('✅ VK Bridge загружен');
             await window.vkBridge.send('VKWebAppInit', {});
-            updateStatus('✨ Приложение готово!');
+            updateStatus('✅ Приложение готово');
             
             try {
               const userInfo = await window.vkBridge.send('VKWebAppGetUserInfo');
               userId = userInfo.id;
-              updateStatus(`🎭 Привет, ${userInfo.first_name}!`);
+              updateStatus(`👤 Пользователь: ${userInfo.first_name}`);
             } catch (e) {
-              updateStatus('🎭 Анонимный путник, твоя судьба ждёт!');
+              updateStatus('👤 Анонимный пользователь');
             }
           }
+          
+          showRandomStory();
+          
         } catch (error) {
-          console.log('VK Bridge:', error.message);
-          updateStatus('✨ Приложение готово! Выбирай историю!');
+          updateStatus('⚠️ Приложение работает');
+          showRandomStory();
         }
       } else {
-        updateStatus('🎮 Демо-режим | Представь, что ты в VK!');
+        updateStatus('🌐 Режим: Демо');
+        showRandomStory();
       }
-      
-      showRandomStory();
     }
 
-    document.addEventListener('DOMContentLoaded', initApp);
+    // Проверяем версию VK Bridge
+    function checkVKBridge() {
+      if (window.vkBridge) {
+        console.log('VK Bridge версия:', window.vkBridge.version);
+        return true;
+      }
+      return false;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (checkVKBridge()) {
+        initApp();
+      } else {
+        updateStatus('❌ VK Bridge не загружен. Проверьте подключение к интернету.');
+        setTimeout(initApp, 2000);
+      }
+    });
   </script>
 </body>
 </html>
