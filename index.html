@@ -148,46 +148,6 @@
       border-radius: 10px;
       font-size: 14px;
     }
-    .share-dialog {
-      background: rgba(0,0,0,0.3);
-      border-radius: 16px;
-      padding: 20px;
-      margin: 20px 0;
-      animation: fadeIn 0.5s ease-out;
-    }
-    .share-dialog h3 {
-      color: #ffd700;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-    .share-dialog p {
-      margin-bottom: 15px;
-      line-height: 1.5;
-    }
-    .share-steps {
-      text-align: left;
-      margin: 15px 0;
-      padding-left: 20px;
-    }
-    .share-steps li {
-      margin-bottom: 8px;
-      line-height: 1.4;
-    }
-    .btn-try-again {
-      background: linear-gradient(45deg, #4CAF50, #8BC34A);
-      color: white;
-    }
-    .btn-back {
-      background: linear-gradient(45deg, #6a11cb, #2575fc);
-      color: white;
-    }
-    .permission-request {
-      background: rgba(255, 215, 0, 0.1);
-      border: 1px solid #ffd700;
-      border-radius: 12px;
-      padding: 15px;
-      margin: 15px 0;
-    }
   </style>
 </head>
 <body>
@@ -283,11 +243,7 @@
           ${outcome}
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
-        <div class="permission-request">
-          <strong>📢 Важно!</strong> При создании истории VK может запросить разрешение.<br>
-          Если увидите окно "Разрешить доступ" - нажмите <strong>"Разрешить"</strong>.
-        </div>
-        <button class="btn btn-share" onclick="createStory()">📲 Поделиться в историях</button>
+        <button class="btn btn-share" onclick="createStoryWithFallback()">📲 Поделиться в историях</button>
         <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
       `;
       
@@ -304,8 +260,8 @@
       return "Тайная личность";
     }
 
-    // ФУНКЦИЯ СОЗДАНИЯ ИСТОРИИ С ПРОСТЫМ ЦВЕТНЫМ ФОНОМ
-    async function createStory() {
+    // ПРОБУЕМ РАЗНЫЕ МЕТОДЫ СОЗДАНИЯ ИСТОРИИ
+    async function createStoryWithFallback() {
       if (isSharing) return;
       isSharing = true;
       
@@ -315,7 +271,7 @@
         // Проверяем, есть ли VK Bridge
         if (!window.vkBridge) {
           updateStatus('❌ VK Bridge не загружен');
-          showShareInstructions();
+          showFallbackInstructions();
           return;
         }
         
@@ -323,121 +279,182 @@
         await window.vkBridge.send('VKWebAppInit', {});
         updateStatus('✅ Приложение инициализировано');
         
-        // Сначала запросим разрешение на публикацию историй
-        // Попробуем использовать VKWebAppAllowMessagesFromGroup для запроса разрешений
+        // Метод 1: Простейший вызов (должен запросить разрешение)
+        updateStatus('🔄 Метод 1: Простой вызов...');
         try {
-          updateStatus('🔄 Запрашиваю разрешения...');
-          await window.vkBridge.send('VKWebAppAllowMessagesFromGroup', {
-            group_id: 0, // 0 означает запрос общих разрешений
+          // Самый простой вызов - VK сам предложит выбрать фото
+          const result1 = await window.vkBridge.send('VKWebAppShowStoryBox', {
+            background_type: 'none'
           });
-        } catch (permError) {
-          console.log('Не удалось запросить разрешения:', permError);
-          // Продолжаем без разрешений
-        }
-        
-        // Создаем простую цветную историю без внешних картинок
-        const currentTitle = getTitle(document.querySelector('.result').textContent);
-        const storyText = `🔥 Я стал: ${currentTitle}!`;
-        
-        // Используем простой цветной фон вместо картинки
-        const storyParams = {
-          background_type: 'none', // Используем цветной фон
-          text: storyText,
-          locked: false
-        };
-        
-        updateStatus('🔄 Создаю историю...');
-        const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
-        
-        if (result && result.result) {
-          updateStatus('✅ История создана!');
-          console.log('История создана:', result);
           
-          setTimeout(() => {
-            alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.');
-            showRandomStory();
-            updateStatus('');
-          }, 1000);
-        } else {
-          throw new Error('История не создана');
+          if (result1) {
+            updateStatus('✅ История создана!');
+            showSuccess();
+            return;
+          }
+        } catch (error1) {
+          console.log('Метод 1 не сработал:', error1);
         }
+        
+        // Метод 2: С PNG картинкой (не SVG)
+        updateStatus('🔄 Метод 2: С PNG картинкой...');
+        try {
+          // Создаем простой PNG градиент через Canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = 1080;
+          canvas.height = 1920;
+          const ctx = canvas.getContext('2d');
+          
+          // Создаем градиент
+          const gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
+          gradient.addColorStop(0, '#6a11cb');
+          gradient.addColorStop(0.5, '#2575fc');
+          gradient.addColorStop(1, '#6a11cb');
+          
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, 1080, 1920);
+          
+          // Добавляем текст
+          ctx.fillStyle = 'white';
+          ctx.font = 'bold 60px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('🔥 Судьба за 10 секунд', 540, 300);
+          
+          const currentTitle = getTitle(document.querySelector('.result').textContent);
+          ctx.font = 'bold 48px Arial';
+          ctx.fillText(`Я стал: ${currentTitle}`, 540, 1000);
+          
+          // Конвертируем в Data URL PNG
+          const pngDataUrl = canvas.toDataURL('image/png');
+          
+          const result2 = await window.vkBridge.send('VKWebAppShowStoryBox', {
+            background_type: 'image',
+            url: pngDataUrl
+          });
+          
+          if (result2) {
+            updateStatus('✅ История создана!');
+            showSuccess();
+            return;
+          }
+        } catch (error2) {
+          console.log('Метод 2 не сработал:', error2);
+        }
+        
+        // Метод 3: Попробуем с внешней картинкой (если Data URL не работают)
+        updateStatus('🔄 Метод 3: С внешней картинкой...');
+        try {
+          // Используем простую картинку с изображением градиента
+          const result3 = await window.vkBridge.send('VKWebAppShowStoryBox', {
+            background_type: 'image',
+            url: 'https://placehold.co/1080x1920/6a11cb/2575fc/png?text=Судьба+за+10+секунд'
+          });
+          
+          if (result3) {
+            updateStatus('✅ История создана!');
+            showSuccess();
+            return;
+          }
+        } catch (error3) {
+          console.log('Метод 3 не сработал:', error3);
+        }
+        
+        // Все методы не сработали
+        updateStatus('❌ Не удалось создать историю');
+        showFallbackInstructions();
         
       } catch (error) {
         console.error('Ошибка создания истории:', error);
         
         let errorMessage = 'Неизвестная ошибка';
-        let errorCode = null;
-        
         if (error.error_message) {
           errorMessage = error.error_message;
         } else if (error.message) {
           errorMessage = error.message;
         } else if (error.error_data && error.error_data.error_reason) {
           errorMessage = error.error_data.error_reason;
-          errorCode = error.error_data.error_code;
         }
         
         updateStatus(`❌ Ошибка: ${errorMessage}`);
-        
-        // Если ошибка "User denied", покажем инструкции
-        if (errorCode === 4 || errorMessage.includes('denied') || errorMessage.includes('отказано')) {
-          showShareInstructions(true);
-        } else {
-          showShareInstructions(false);
-        }
+        showFallbackInstructions();
         
       } finally {
         isSharing = false;
       }
     }
 
-    function showShareInstructions(isPermissionDenied) {
+    function showSuccess() {
+      setTimeout(() => {
+        alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.');
+        showRandomStory();
+        updateStatus('');
+      }, 1000);
+    }
+
+    function showFallbackInstructions() {
       const currentTitle = getTitle(document.querySelector('.result').textContent);
       const shareUrl = `https://vk.com/app${APP_ID}`;
       const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇\n${shareUrl}`;
       
-      let dialogTitle = '📸 Как поделиться в историях';
-      let dialogMessage = '';
+      // Создаем PNG для скачивания
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1920;
+      const ctx = canvas.getContext('2d');
       
-      if (isPermissionDenied) {
-        dialogTitle = '⚠️ Требуется разрешение';
-        dialogMessage = `
-          <p>Для создания историй нужно разрешение от VK.</p>
-          <p>Попробуйте:</p>
-          <ol class="share-steps">
-            <li>Перезагрузить приложение</li>
-            <li>Проверить настройки VK</li>
-            <li>Или поделиться вручную через скриншот</li>
-          </ol>
-        `;
-      } else {
-        dialogMessage = `
-          <p>Автоматическое создание истории не сработало.</p>
-          <p>Вы можете поделиться вручную:</p>
-          <ol class="share-steps">
-            <li>Сделайте скриншот этого экрана</li>
-            <li>Откройте ВКонтакте</li>
-            <li>Нажмите "Создать историю"</li>
-            <li>Добавьте скриншот и текст ниже:</li>
-          </ol>
-        `;
-      }
+      // Градиентный фон
+      const gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
+      gradient.addColorStop(0, '#6a11cb');
+      gradient.addColorStop(0.5, '#2575fc');
+      gradient.addColorStop(1, '#6a11cb');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 1080, 1920);
+      
+      // Текст
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 60px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('🔥 Судьба за 10 секунд', 540, 300);
+      
+      ctx.font = 'bold 48px Arial';
+      ctx.fillText(`Я стал: ${currentTitle}`, 540, 1000);
+      
+      ctx.font = '36px Arial';
+      ctx.fillText('Узнай свою судьбу', 540, 1200);
+      ctx.fillText('за 10 секунд!', 540, 1260);
+      
+      const pngDataUrl = canvas.toDataURL('image/png');
       
       document.getElementById('game').innerHTML = `
         <div class="result" id="resultBox">
           ${document.querySelector('.result').innerHTML}
         </div>
-        <div class="share-dialog">
-          <h3>${dialogTitle}</h3>
-          ${dialogMessage}
-          <div class="link-preview" style="background: #f5f5f5; color: #333; padding: 10px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
+        <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 16px; margin: 20px 0;">
+          <h3 style="color: #ffd700; margin-bottom: 15px;">📸 Создайте историю вручную</h3>
+          <p style="margin-bottom: 15px;">1. <strong>Скачайте картинку:</strong> нажмите на неё ниже, затем "Сохранить как"</p>
+          <img src="${pngDataUrl}" style="width: 100%; border-radius: 10px; margin: 10px 0; cursor: pointer;" 
+               onclick="downloadImage('${pngDataUrl}', 'sudyba-${currentTitle}.png')">
+          <p style="margin: 15px 0;">2. <strong>Добавьте этот текст в историю:</strong></p>
+          <div style="background: #f5f5f5; color: #333; padding: 15px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
             ${shareText}
           </div>
+          <p><em>Или просто сделайте скриншот этого экрана</em></p>
         </div>
-        <button class="btn btn-try-again" onclick="createStory()">🔄 Попробовать снова</button>
-        <button class="btn btn-copy" onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n')}')">📋 Скопировать текст</button>
-        <button class="btn btn-back" onclick="showRandomStory()">🏠 Вернуться в игру</button>
+        <button class="btn btn-share" onclick="createStoryWithFallback()">🔄 Попробовать снова</button>
+        <button class="btn" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); color: white;" 
+                onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n')}')">📋 Скопировать текст</button>
+        <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
       `;
+    }
+
+    function downloadImage(dataUrl, filename) {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     function copyToClipboard(text) {
