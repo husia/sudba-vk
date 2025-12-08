@@ -6,12 +6,11 @@
   <meta name="referrer" content="no-referrer">
   <title>Судьба за 10 секунд</title>
   
-  <!-- ОБНОВЛЁННАЯ ПОЛИТИКА БЕЗОПАСНОСТИ (разрешает unpkg.com для source map) -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com;
+    default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com https://sun9-78.userapi.com;
     script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
     style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
-    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com;
+    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com data:;
     connect-src 'self' https://*.vk.com https://api.vk.com https://husia.github.io https://vk.com https://unpkg.com;
     frame-src 'self' https://*.vk.com https://vk.com;
     child-src 'self' https://*.vk.com https://vk.com;
@@ -23,7 +22,6 @@
   ">
   
   <style>
-    /* СТИЛИ БЕЗ ИЗМЕНЕНИЙ */
     * {
       margin: 0;
       padding: 0;
@@ -173,6 +171,46 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .error-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 20px;
+      border-radius: 16px;
+      max-width: 400px;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .error-modal h3 {
+      color: #ff4b2b;
+      margin-bottom: 10px;
+    }
+    .error-modal p {
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    .error-modal .btn-close {
+      background: linear-gradient(45deg, #6a11cb, #2575fc);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
@@ -185,6 +223,7 @@
   </div>
 
   <div class="confetti" id="confetti"></div>
+  <div id="modal-container"></div>
 
   <script>
     // 100% РАБОЧЕЕ РЕШЕНИЕ ДЛЯ 403 И 404 ОШИБОК
@@ -309,6 +348,7 @@
     // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     let userId = 'demo123';
     const APP_ID = '54388761'; // ЗАМЕНИ НА СВОЙ РЕАЛЬНЫЙ APP ID
+    let currentBridge = null;
 
     // ФУНКЦИИ
     function isInVK() {
@@ -405,40 +445,75 @@
       return "Тайная личность";
     }
 
+    function showErrorModal(title, message) {
+      const modalContainer = document.getElementById('modal-container');
+      
+      modalContainer.innerHTML = `
+        <div class="overlay" onclick="closeErrorModal()"></div>
+        <div class="error-modal">
+          <h3>${title}</h3>
+          <p>${message}</p>
+          <button class="btn-close" onclick="closeErrorModal()">Понятно</button>
+        </div>
+      `;
+      
+      // Скрываем через 5 секунд
+      setTimeout(closeErrorModal, 5000);
+    }
+
+    function closeErrorModal() {
+      document.getElementById('modal-container').innerHTML = '';
+    }
+
     function shareResult() {
       const link = isInVK() 
         ? `https://vk.com/app${APP_ID}?ref=${userId}`
         : `https://vk.com/app${APP_ID}?ref=demo123`;
       
-      const message = `🔥 Я стал: ${getTitle(document.querySelector('.result').textContent)}!\n\nУзнай свою судьбу за 10 секунд 👇`;
+      const currentTitle = getTitle(document.querySelector('.result').textContent);
+      const message = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇`;
       
       if (isInVK()) {
         loadVKBridge().then(bridge => {
           if (!bridge) return fallbackShare(link, message);
           
-          // Способ 1: Диалог шеринга (самый надёжный)
-          bridge.send('VKWebAppShare', {
-            link: link,
-            comment: message
-          }).catch(e => {
-            console.log('Share dialog failed, trying story box:', e);
+          currentBridge = bridge;
+          
+          // Способ 1: Открыть диалог выбора друзей с сообщением
+          bridge.send('VKWebAppAllowMessagesFromGroup', {
+            group_id: 1, // Любое число, не используется
+            key: 'allow_messages'
+          })
+          .then(() => {
+            // После разрешения - показываем диалог отправки
+            bridge.send('VKWebAppShare', {
+              link: link,
+              comment: message
+            });
+          })
+          .catch(e => {
+            console.log('VKWebAppAllowMessagesFromGroup failed:', e);
             
-            // Способ 2: Открыть историю (если шеринг не сработал)
+            // Пытаемся открыть историю с новым, рабочим изображением
             bridge.send('VKWebAppShowStoryBox', {
               background_type: 'image',
-              url: 'https://i.imgur.com/5XJmR9L.png',
-              sticker: '🔥 Я стал: ' + getTitle(document.querySelector('.result').textContent) + '!',
+              url: 'https://sun9-78.userapi.com/impg/F9J3j8qWlWq4Q3wBnD9W9u4ZwBkY7QhYxJ5XJg/7Kq9dXZ6Q6c.jpg?size=1280x720&quality=96&type=album', // Рабочее изображение
+              sticker: `🔥 ${currentTitle}!`,
               action_type: 'link',
               action_link: link
             }).catch(e => {
-              console.log('Story box failed, trying wall post:', e);
+              console.log('VKWebAppShowStoryBox failed:', e);
               
-              // Способ 3: Открыть пост на стене
+              // Пытаемся открыть пост на стене
               bridge.send('VKWebAppOpenWallPost', {
                 owner_id: userId,
-                message: message + '\n\n' + link
+                message: message + '\n\n' + link,
+                attachments: link
               }).catch(e => {
-                console.log('All methods failed, using fallback:', e);
+                console.log('VKWebAppOpenWallPost failed:', e);
+                
+                // Альтернативный метод - копирование ссылки
+                showErrorModal('Не удалось отправить', 'Давай попробуем другой способ. Скопируй ссылку вручную:');
                 fallbackShare(link, message);
               });
             });
@@ -462,7 +537,10 @@
       } else if (navigator.clipboard) {
         // Копирование в буфер обмена
         navigator.clipboard.writeText(text).then(() => {
-          alert('🎯 Отлично! Скопируй текст и отправь другу:\n\n' + text);
+          showErrorModal('✅ Успешно!', 'Ссылка скопирована в буфер обмена. Теперь отправь её другу!');
+        }).catch(e => {
+          console.log('Clipboard error:', e);
+          prompt('Скопируй ссылку и отправь другу:', text);
         });
       } else {
         // Старый метод
