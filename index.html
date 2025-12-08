@@ -253,6 +253,40 @@
       border-radius: 10px;
       font-size: 14px;
     }
+    .image-selector {
+      background: rgba(0,0,0,0.2);
+      padding: 15px;
+      border-radius: 12px;
+      margin: 15px 0;
+    }
+    .image-selector h3 {
+      color: #ffd700;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .image-options {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .image-option {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .image-option:hover {
+      transform: scale(1.05);
+      border-color: #ffcc00;
+    }
+    .image-option.selected {
+      border-color: #ff416c;
+      box-shadow: 0 0 10px rgba(255, 65, 108, 0.5);
+    }
   </style>
 </head>
 <body>
@@ -303,6 +337,37 @@
     let userId = 'demo123';
     const APP_ID = '54388761';
     let isSharing = false;
+    
+    // СПИСОК РАБОЧИХ КАРТИНОК
+    const STORY_IMAGES = [
+      {
+        id: 1,
+        url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+        name: 'Космос'
+      },
+      {
+        id: 2,
+        url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+        name: 'Горы'
+      },
+      {
+        id: 3,
+        url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+        name: 'Неон'
+      },
+      {
+        id: 4,
+        url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+        name: 'Горы 2'
+      },
+      {
+        id: 5,
+        url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+        name: 'Абстракция'
+      }
+    ];
+    
+    let selectedImageIndex = 0; // Индекс выбранной картинки
 
     // ФУНКЦИИ
     function isInVK() {
@@ -343,16 +408,63 @@
       const outcome = STORIES[storyId].options[choice].outcome;
       const title = getTitle(outcome);
       
+      // Создаем HTML для выбора картинки
+      let imageSelectorHtml = `
+        <div class="image-selector">
+          <h3>🎨 Выбери фон для истории</h3>
+          <div class="image-options">
+      `;
+      
+      STORY_IMAGES.forEach((image, index) => {
+        const selectedClass = index === selectedImageIndex ? 'selected' : '';
+        imageSelectorHtml += `
+          <img src="${image.url}" 
+               class="image-option ${selectedClass}" 
+               alt="${image.name}"
+               title="${image.name}"
+               onclick="selectImage(${index})">
+        `;
+      });
+      
+      imageSelectorHtml += `
+          </div>
+          <p>Текущий фон: <strong>${STORY_IMAGES[selectedImageIndex].name}</strong></p>
+        </div>
+      `;
+      
       const resultHtml = `
         <div class="result" id="resultBox">
           ${outcome}
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
+        ${imageSelectorHtml}
         <button class="btn btn-share" onclick="tryShareResult()">📲 Поделиться в историях</button>
         <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
       `;
       
       document.getElementById('game').innerHTML = resultHtml;
+    }
+
+    function selectImage(index) {
+      selectedImageIndex = index;
+      
+      // Обновляем отображение выбранной картинки
+      const imageOptions = document.querySelectorAll('.image-option');
+      imageOptions.forEach((img, i) => {
+        if (i === index) {
+          img.classList.add('selected');
+        } else {
+          img.classList.remove('selected');
+        }
+      });
+      
+      // Обновляем текст с названием выбранной картинки
+      const nameElement = document.querySelector('.image-selector p strong');
+      if (nameElement) {
+        nameElement.textContent = STORY_IMAGES[index].name;
+      }
+      
+      updateStatus(`✅ Выбран фон: ${STORY_IMAGES[index].name}`);
     }
 
     function getTitle(outcome) {
@@ -383,10 +495,11 @@
 
     // ПРОСТАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА (без attachment)
     async function shareResultSimple() {
-      if (isSharing) return;
+      if (isSharing) return false;
       isSharing = true;
       
-      updateStatus('🔄 Начинаю создание истории...');
+      const selectedImage = STORY_IMAGES[selectedImageIndex];
+      updateStatus(`🔄 Создаю историю с фоном "${selectedImage.name}"...`);
       
       try {
         // Проверяем, есть ли VK Bridge
@@ -399,14 +512,13 @@
         await window.vkBridge.send('VKWebAppInit', {});
         updateStatus('✅ Приложение инициализировано');
         
-        // ИСПРАВЛЕНО: Создаем историю БЕЗ attachment
-        // Просто картинка без дополнительных параметров
+        // Создаем историю с выбранной картинкой
         const storyParams = {
           background_type: 'image',
-          url: 'https://i.imgur.com/OQ6nZwQ.jpg' // Просто URL картинки
+          url: selectedImage.url // Используем выбранную картинку
         };
         
-        updateStatus('🔄 Создаю историю...');
+        updateStatus('🔄 Отправляю запрос на создание истории...');
         const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
         
         if (result) {
@@ -419,7 +531,17 @@
         
       } catch (error) {
         console.error('Ошибка создания истории:', error);
-        updateStatus(`❌ Ошибка: ${error.error_message || error.message || 'Неизвестная ошибка'}`);
+        
+        let errorMessage = 'Неизвестная ошибка';
+        if (error.error_message) {
+          errorMessage = error.error_message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else if (error.error_data && error.error_data.error_reason) {
+          errorMessage = error.error_data.error_reason;
+        }
+        
+        updateStatus(`❌ Ошибка: ${errorMessage}`);
         return false;
       } finally {
         isSharing = false;
@@ -433,10 +555,12 @@
         
         await window.vkBridge.send('VKWebAppInit', {});
         
+        const selectedImage = STORY_IMAGES[selectedImageIndex];
+        
         // Используем правильный тип кнопки "play" для игр
         const storyParams = {
           background_type: 'image',
-          url: 'https://i.imgur.com/OQ6nZwQ.jpg',
+          url: selectedImage.url,
           attachment: {
             text: 'play', // Правильный тип для игр
             url: `https://vk.com/app${APP_ID}`
@@ -451,34 +575,8 @@
       }
     }
 
-    // ПОПЫТКА С ДРУГИМ ТИПОМ ATTACHMENT
-    async function shareResultAlternative() {
-      try {
-        if (!window.vkBridge) return false;
-        
-        await window.vkBridge.send('VKWebAppInit', {});
-        
-        // Пробуем другой формат без текста
-        const storyParams = {
-          background_type: 'image',
-          url: 'https://i.imgur.com/OQ6nZwQ.jpg',
-          attachment: {
-            type: 'url',
-            url: `https://vk.com/app${APP_ID}`
-          }
-        };
-        
-        const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
-        return !!result;
-      } catch (error) {
-        console.log('Альтернативный метод не сработал:', error);
-        return false;
-      }
-    }
-
-    // ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА (пробуем все варианты)
+    // ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА
     async function tryShareResult() {
-      const currentTitle = getTitle(document.querySelector('.result').textContent);
       updateStatus('🔄 Пробую создать историю...');
       
       // Пробуем простой метод (без attachment)
@@ -490,21 +588,15 @@
         success = await shareResultWithAttachment();
       }
       
-      // Если все еще не получилось, пробуем альтернативный
-      if (!success) {
-        updateStatus('🔄 Пробую третий метод...');
-        success = await shareResultAlternative();
-      }
-      
       if (success) {
-        updateStatus('✅ История создана!');
+        updateStatus('✅ История успешно создана!');
         setTimeout(() => {
-          alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.');
+          alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.\n\nСовет: Вы можете добавить текст к истории в редакторе VK!');
           showRandomStory();
           updateStatus('');
         }, 1000);
       } else {
-        updateStatus('❌ Не удалось создать историю');
+        updateStatus('❌ Не удалось создать историю автоматически');
         showManualShareInstructions();
       }
     }
@@ -513,6 +605,8 @@
       const currentTitle = getTitle(document.querySelector('.result').textContent);
       const shareUrl = `https://vk.com/app${APP_ID}`;
       const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇\n${shareUrl}`;
+      
+      const selectedImage = STORY_IMAGES[selectedImageIndex];
       
       document.getElementById('game').innerHTML = `
         <div class="result" id="resultBox">
@@ -527,6 +621,9 @@
             <li>Добавьте скриншот и текст ниже:</li>
           </ol>
           <div class="link-preview">${shareText}</div>
+          <p>Или используйте эту картинку как фон:</p>
+          <img src="${selectedImage.url}" style="width: 100%; border-radius: 10px; margin: 10px 0;">
+          <p><em>Нажмите на картинку, чтобы открыть в полном размере, затем сохраните её</em></p>
         </div>
         <button class="btn btn-copy" onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n')}')">📋 Скопировать текст</button>
         <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
