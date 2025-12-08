@@ -6,19 +6,14 @@
   <meta name="referrer" content="no-referrer">
   <title>Судьба за 10 секунд</title>
   
+  <!-- УПРОЩЕННЫЙ CSP -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com https://sun9-86.userapi.com https://sun9-4.userapi.com;
-    script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
-    style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
-    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com https://sun9-86.userapi.com https://sun9-4.userapi.com https://vkuserimages.com data:;
-    connect-src 'self' https://*.vk.com https://api.vk.com https://husia.github.io https://vk.com https://unpkg.com;
-    frame-src 'self' https://*.vk.com https://vk.com;
-    child-src 'self' https://*.vk.com https://vk.com;
-    worker-src 'none';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    upgrade-insecure-requests;
+    default-src 'self' https://*.vk.com https://unpkg.com https://i.imgur.com;
+    script-src 'self' 'unsafe-inline' https://*.vk.com https://unpkg.com;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' https: data:;
+    connect-src 'self' https://*.vk.com https://api.vk.com;
+    frame-src 'self' https://*.vk.com;
   ">
   
   <style>
@@ -167,10 +162,6 @@
       margin: 40px 0;
       animation: pulse 1.5s infinite;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
     .error-modal {
       position: fixed;
       top: 50%;
@@ -241,12 +232,6 @@
       margin-bottom: 5px;
       line-height: 1.4;
     }
-    .modal-footer {
-      margin-top: 15px;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }
     .btn-copy {
       background: linear-gradient(45deg, #4CAF50, #8BC34A);
       color: white;
@@ -268,16 +253,12 @@
       word-break: break-all;
       color: #333;
     }
-    .debug-info {
-      background: rgba(0,0,0,0.3);
+    .status {
+      margin-top: 20px;
       padding: 10px;
-      border-radius: 8px;
-      margin: 10px 0;
-      font-family: monospace;
-      font-size: 12px;
-      text-align: left;
-      max-height: 150px;
-      overflow-y: auto;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -285,8 +266,9 @@
   <div class="container">
     <h1>🔥 Судьба за 10 секунд</h1>
     <div id="game">
-      <div class="loading">✨ Загрузка историй...</div>
+      <div class="loading">✨ Загрузка...</div>
     </div>
+    <div id="status" class="status"></div>
     <div class="footer">Создано с абсурдом и любовью ❤️</div>
   </div>
 
@@ -294,44 +276,7 @@
   <div id="modal-container"></div>
 
   <script>
-    // 100% РАБОЧЕЕ РЕШЕНИЕ ДЛЯ 403 И 404 ОШИБОК
-    (function() {
-      // Блокируем все запросы к stats.vk-portal.net
-      const originalFetch = window.fetch;
-      window.fetch = async (url, options = {}) => {
-        if (typeof url === 'string' && url.includes('stats.vk-portal.net')) {
-          console.log('✅ Статистика VK успешно обойдена (403 ошибка)');
-          return {
-            ok: true,
-            status: 200,
-            json: () => Promise.resolve({ success: true }),
-            text: () => Promise.resolve('blocked')
-          };
-        }
-        return originalFetch(url, options);
-      };
-      
-      // Блокируем XHR запросы к stats
-      const originalXhr = window.XMLHttpRequest;
-      window.XMLHttpRequest = function() {
-        const xhr = new originalXhr();
-        const open = xhr.open;
-        xhr.open = function(method, url) {
-          if (typeof url === 'string' && url.includes('stats.vk-portal.net')) {
-            this.onload = () => {
-              this.responseText = JSON.stringify({ success: true });
-              this.status = 200;
-              this.readyState = 4;
-            };
-            this.send = () => {};
-          }
-          return open.apply(this, arguments);
-        };
-        return xhr;
-      };
-    })();
-    
-    // ИСТОРИИ (встроены напрямую для надежности)
+    // ИСТОРИИ
     const STORIES = {
       "1": {
         "text": "🔥 Ты проснулся в теле ИИ, который управляет всеми мемами Вселенной...\n\nЧто запустишь?",
@@ -358,96 +303,33 @@
             "premium": false
           }
         }
-      },
-      "3": {
-        "text": "🐱 Твой кот говорит: «Я — шпион». Ты...",
-        "options": {
-          "A": {
-            "outcome": "🕶️ ТЫ СТАЛ: КОТО-АГЕНТОМ\n\nТеперь вы в паре. Ваша миссия — украсть\nвсе вкусняшки в округе. Успех: 100%.\n\n🐟 Уровень секретности: 99/100",
-            "premium": false
-          },
-          "B": {
-            "outcome": "👑 ТЫ СТАЛ: СЛУГОЙ КОРОЛЯ\n\nПризнал власть кота. Теперь носишь корону\nиз пивных крышек. Честь: максимальна.\n\n👑 Уровень подчинения: 100/100",
-            "premium": false
-          }
-        }
-      },
-      "4": {
-        "text": "☕ Утром вместо кофе ты нашёл...?",
-        "options": {
-          "A": {
-            "outcome": "🧪 ТЫ СТАЛ: МЕМ-ПРОРОКОМ\n\nНапиток даёт способность предсказывать мемы.\nТы знал про «танцующего Путина» за неделю.\n\n🔮 Уровень пророчества: 96/100",
-            "premium": false
-          },
-          "B": {
-            "outcome": "🪄 ТЫ СТАЛ: ВОЛШЕБНОЙ ЧАШКОЙ\n\nТвоя чашка отвечает на все вопросы.\nНо только мемами. Мудрость: бесценна.\n\n🤣 Уровень юмора: 99/100",
-            "premium": false
-          }
-        }
-      },
-      "5": {
-        "text": "🎭 Ты можешь стереть один мем из истории. Какой?",
-        "options": {
-          "A": {
-            "outcome": "🗑️ ТЫ СТАЛ: ОСВОБОДИТЕЛЕМ КОТОВ\n\nУдалил «Кот с огурцом». Коты больше не боятся.\nОни построили тебе памятник из вискаса.\n\n😻 Уровень добра: 92/100",
-            "premium": false
-          },
-          "B": {
-            "outcome": "🔥 ТЫ СТАЛ: ВОССТАНОВИТЕЛЕМ ПРАВДЫ\n\nУдалил «Это не я, это мой брат».\nТеперь все честны. Мир стал скучным, но чистым.\n\n🕊️ Уровень правды: 100/100",
-            "premium": false
-          }
-        }
-      },
-      "101": {
-        "text": "✨ Ты — создатель новой Вселенной. Какой закон физики отменишь?",
-        "options": {
-          "A": {
-            "outcome": "🌀 ТЫ СТАЛ: БОГ АБСУРДА\n\nОтменил логику во вторник.\nТеперь все вторники — сплошной мем.\n\n💥 Сила хаоса: MAX",
-            "premium": true
-          },
-          "B": {
-            "outcome": "🪐 ТЫ СТАЛ: ГРАВИТАЦИОННЫЙ ХУДОЖНИК\n\nОтменил гравитацию. Все летают, как в мечтах.\nТы — новый Бог.\n\n🕊️ Уровень свободы: 100/100",
-            "premium": true
-          }
-        }
       }
     };
 
     // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     let userId = 'demo123';
-    const APP_ID = '54388761'; // ВАШ APP_ID
-    let currentBridge = null;
-    let isSharing = false; // Флаг для отслеживания состояния шеринга
+    const APP_ID = '54388761';
+    let isSharing = false;
 
     // ФУНКЦИИ
     function isInVK() {
-      const isWebView = window.navigator.userAgent.includes('VK');
-      const hasVKParams = window.location.search.includes('vk_');
-      const isVKDomain = window.location.hostname.includes('vk.com');
-      
-      return isWebView || hasVKParams || isVKDomain;
-    }
-
-    function getVKParams() {
       const params = new URLSearchParams(window.location.search);
-      return {
-        vk_user_id: params.get('vk_user_id'),
-        vk_app_id: params.get('vk_app_id'),
-        vk_is_app_user: params.get('vk_is_app_user'),
-        vk_ref: params.get('vk_ref')
-      };
+      return params.has('vk_user_id') || 
+             navigator.userAgent.includes('VK') || 
+             window.location.hostname.includes('vk.com');
     }
 
-    function getRandomFreeStoryId() {
-      const freeIds = Object.keys(STORIES).filter(id => 
-        !Object.values(STORIES[id].options).some(opt => opt.premium)
-      );
-      return freeIds[Math.floor(Math.random() * freeIds.length)] || "1";
+    function updateStatus(text) {
+      const statusEl = document.getElementById('status');
+      if (statusEl) {
+        statusEl.innerHTML = text;
+        console.log('Status:', text);
+      }
     }
 
-    function showRandomStory(storyId = null) {
-      const id = storyId || getRandomFreeStoryId();
-      const story = STORIES[id];
+    function showRandomStory() {
+      const storyId = "1"; // Для простоты всегда показываем первую историю
+      const story = STORIES[storyId];
       
       if (!story) {
         document.getElementById('game').innerHTML = '<p>Ошибка: история не найдена.</p>';
@@ -458,11 +340,7 @@
       
       for (const key in story.options) {
         const opt = story.options[key];
-        if (opt.premium) {
-          html += `<button class="btn btn-premium" onclick="premiumStub('${id}', '${key}')">💎 ${key} (Премиум)</button>`;
-        } else {
-          html += `<button class="btn btn-free" onclick="showResult('${id}', '${key}')">${key}</button>`;
-        }
+        html += `<button class="btn btn-free" onclick="showResult('${storyId}', '${key}')">${key}</button>`;
       }
       
       document.getElementById('game').innerHTML = html;
@@ -470,38 +348,18 @@
 
     function showResult(storyId, choice) {
       const outcome = STORIES[storyId].options[choice].outcome;
-      
-      const friendsList = [
-        "@ivan → 'Кот-хакер'",
-        "@maria → 'ИИ-бариста'",
-        "@petr → 'Президент Марса'",
-        "@lena → 'Нейро-шаман'",
-        "@barsik → 'Тайный агент'"
-      ];
-      const shuffled = [...friendsList].sort(() => 0.5 - Math.random());
-      const friends = shuffled.slice(0, 2).join('\n');
-      
-      let rarity = "Обычная";
-      if (outcome.includes("999/100") || outcome.includes("MAX")) rarity = "Легендарная";
-      else if (outcome.includes("9")) rarity = "Эпическая";
+      const title = getTitle(outcome);
       
       const resultHtml = `
         <div class="result" id="resultBox">
           ${outcome}
-          <div class="rarity">💎 Редкость: ${rarity}</div>
+          <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
-        <div class="friends">
-          👀 ВАШИ ДРУЗЬЯ:<br>${friends}<br>
-          — Вы → <b>${getTitle(outcome)}</b> 👑
-        </div>
-        <button class="btn btn-share" onclick="shareResult()">📲 Сравнить судьбы?</button>
+        <button class="btn btn-share" onclick="shareResult()">📲 Поделиться в историях</button>
         <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
-        <button class="btn btn-premium" onclick="showPremium()">💎 Премиум-судьбы</button>
       `;
       
       document.getElementById('game').innerHTML = resultHtml;
-      
-      if (rarity === "Легендарная") triggerConfetti();
     }
 
     function getTitle(outcome) {
@@ -524,190 +382,63 @@
           <button class="btn-close" onclick="closeErrorModal()">Понятно</button>
         </div>
       `;
-      // Скрываем через 8 секунд
-      setTimeout(closeErrorModal, 8000);
     }
 
     function closeErrorModal() {
       document.getElementById('modal-container').innerHTML = '';
     }
 
-    function copyResultText(text) {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-          showErrorModal('✅ Скопировано!', 'Текст скопирован! Теперь вставь его при публикации истории.');
-        });
-      } else {
-        prompt('Скопируй текст для подписи:', text);
-      }
-    }
-
-    // ЗАГРУЗКА VK BRIDGE С ОБРАБОТКОЙ ЗАКРЫТИЯ ОКНА
-    function loadVKBridge() {
-      return new Promise((resolve) => {
-        if (window.vkBridge) {
-          console.log('✅ Bridge уже загружен');
-          resolve(window.vkBridge);
-          return;
-        }
-        
-        // Проверяем, запущено ли приложение во ВКонтакте
-        if (!isInVK()) {
-          console.log('✅ Не во ВКонтакте, пропускаем загрузку bridge');
-          resolve(null);
-          return;
-        }
-        
-        console.log('🔄 Загружаем VK Bridge...');
-        
-        // Создаём скрипт для загрузки VK Bridge (последняя версия)
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/@vkontakte/vk-bridge@6.0.0/dist/index.umd.js';
-        script.async = true;
-        
-        script.onload = () => {
-          console.log('✅ VK Bridge загружен');
-          if (typeof window.vkBridge !== 'undefined') {
-            // Инициализируем bridge
-            window.vkBridge.send('VKWebAppInit', {})
-              .then(() => {
-                console.log('✅ Bridge инициализирован');
-                resolve(window.vkBridge);
-              })
-              .catch(err => {
-                console.log('❌ Bridge init error:', err);
-                resolve(null);
-              });
-          } else {
-            console.log('❌ Bridge не найден в window');
-            resolve(null);
-          }
-        };
-        
-        script.onerror = (error) => {
-          console.log('❌ Ошибка загрузки Bridge:', error);
-          resolve(null);
-        };
-        
-        document.head.appendChild(script);
-        
-        // Таймаут на случай, если скрипт зависнет
-        setTimeout(() => {
-          if (!window.vkBridge) {
-            console.log('⏰ Таймаут загрузки Bridge');
-            resolve(null);
-          }
-        }, 5000);
-      });
-    }
-
-    // ОСНОВНАЯ ФУНКЦИЯ ШЕРИНГА С ПРАВИЛЬНОЙ ОБРАБОТКОЙ СОСТОЯНИЙ
-    function shareResult() {
-      if (isSharing) return; // Предотвращаем повторные вызовы
-      
+    // ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА
+    async function shareResult() {
+      if (isSharing) return;
       isSharing = true;
+      
       const currentTitle = getTitle(document.querySelector('.result').textContent);
-      const link = `https://vk.com/app${APP_ID}?ref=${userId}`;
+      updateStatus('🔄 Начинаю создание истории...');
       
-      // ГОТОВИМ КОРОТКИЙ ТЕКСТ ДЛЯ СТИКЕРА (максимум 35 символов!)
-      let stickerText = `🔥 ${currentTitle}`;
-      if (stickerText.length > 35) {
-        stickerText = stickerText.substring(0, 32) + '...';
-      }
-      
-      if (isInVK()) {
-        loadVKBridge().then(bridge => {
-          if (!bridge) {
-            showManualShareInstructions();
-            isSharing = false;
-            return;
-          }
-          
-          currentBridge = bridge;
-          
-          // Показываем лоадер
-          document.getElementById('game').innerHTML = `
-            <div class="loading" style="margin: 40px 0;">
-              📱 Создаю историю...
-              <div class="debug-info" id="debugInfo"></div>
-            </div>
-          `;
-          
-          // Более простое изображение для теста
-          const testImageUrl = 'https://i.imgur.com/OQ6nZwQ.jpg'; // Простая тестовая картинка
-          
-          console.log('🔄 Отправляем запрос на создание истории...');
-          console.log('📊 Параметры:', {
-            background_type: 'image',
-            url: testImageUrl,
-            attachment: {
-              text: stickerText,
-              type: 'text',
-              style: 'light'
-            },
-            locked: false
-          });
-          
-          // СОЗДАЕМ ИСТОРИЮ С ТЕКСТОМ
-          bridge.send('VKWebAppShowStoryBox', {
-            background_type: 'image',
-            url: testImageUrl,
-            attachment: {
-              text: stickerText,
-              type: 'text',
-              style: 'light'
-            },
-            locked: false
-          })
-          .then((data) => {
-            console.log('✅ История успешно создана:', data);
-            document.getElementById('debugInfo').innerHTML = '✅ Успех! История создана.<br>Данные: ' + JSON.stringify(data);
-            
-            // УСПЕШНОЕ СОЗДАНИЕ ИСТОРИИ
-            setTimeout(() => {
-              resetGameAfterSharing();
-            }, 1000);
-          })
-          .catch(error => {
-            console.log('❌ Story creation failed:', error);
-            document.getElementById('debugInfo').innerHTML = '❌ Ошибка: ' + JSON.stringify(error, null, 2);
-            
-            // Проверяем конкретную ошибку
-            let errorMessage = 'Не удалось создать историю. ';
-            
-            if (error && error.error_type === 'client_error') {
-              errorMessage += 'Возможно, у пользователя нет доступа к созданию историй или не установлено приложение ВКонтакте.';
-            } else if (error && error.error_type === 'api_error') {
-              errorMessage += 'Ошибка API ВКонтакте. Код: ' + (error.error_code || 'неизвестен');
-            } else {
-              errorMessage += 'Попробуйте сделать скриншот и опубликовать вручную.';
-            }
-            
-            showErrorModal('📱 История не создана', errorMessage);
-            
-            setTimeout(() => {
-              showManualShareInstructions();
-            }, 2000);
-          })
-          .finally(() => {
-            isSharing = false;
-          });
-        }).catch(err => {
-          console.log('❌ Bridge load error:', err);
+      try {
+        // Проверяем, есть ли VK Bridge
+        if (!window.vkBridge) {
+          updateStatus('❌ VK Bridge не загружен');
           showManualShareInstructions();
-          isSharing = false;
+          return;
+        }
+        
+        // Инициализируем приложение
+        await window.vkBridge.send('VKWebAppInit', {});
+        updateStatus('✅ Приложение инициализировано');
+        
+        // Создаем историю
+        const result = await window.vkBridge.send('VKWebAppShowStoryBox', {
+          background_type: 'image',
+          url: 'https://i.imgur.com/OQ6nZwQ.jpg',
+          attachment: {
+            text: `🔥 ${currentTitle}`,
+            type: 'text'
+          }
         });
-      } else {
+        
+        updateStatus('✅ История создана!');
+        console.log('История создана:', result);
+        
+        // Возвращаемся в игру через 2 секунды
+        setTimeout(() => {
+          showRandomStory();
+          updateStatus('');
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Ошибка создания истории:', error);
+        updateStatus(`❌ Ошибка: ${error.error_message || 'Неизвестная ошибка'}`);
         showManualShareInstructions();
+      } finally {
         isSharing = false;
       }
     }
 
-    // ФУНКЦИЯ ДЛЯ РУЧНОГО ШЕРИНГА (СКРИНШОТЫ)
     function showManualShareInstructions() {
       const currentTitle = getTitle(document.querySelector('.result').textContent);
-      const outcomeText = document.querySelector('.result').textContent;
-      const fullResult = `🔥 Я стал: ${currentTitle}!\n\n${outcomeText}\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}`;
+      const fullResult = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}`;
       
       document.getElementById('game').innerHTML = `
         <div class="result" id="resultBox">
@@ -716,147 +447,74 @@
         <div class="share-instruction">
           <h3>📸 Как поделиться в историях</h3>
           <ol>
-            <li>Сделайте скриншот этого экрана (кнопка Print Screen или скриншот в телефоне)</li>
-            <li>Откройте камеры ВКонтакте</li>
-            <li>Выберите сделанный скриншот</li>
-            <li>В описание скопируйте текст ниже и опубликуйте</li>
+            <li>Сделайте скриншот этого экрана</li>
+            <li>Откройте ВКонтакте и создайте историю</li>
+            <li>Добавьте скриншот и текст ниже:</li>
           </ol>
-          <div class="link-preview" style="background: #f8f9fa; color: #333; padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; text-align: left;">
-            ${fullResult}
-          </div>
+          <div class="link-preview">${fullResult}</div>
         </div>
-        <button class="btn btn-share" onclick="copyResultText('${fullResult.replace(/'/g, "\\'")}')">📋 Скопировать текст для подписи</button>
-        <button class="btn btn-free" style="margin-top: 10px;" onclick="resetGameAfterSharing()">🏠 Вернуться в игру</button>
+        <button class="btn btn-share" onclick="navigator.clipboard.writeText('${fullResult}').then(() => alert('Текст скопирован!'))">📋 Скопировать текст</button>
+        <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
       `;
     }
 
-    // ВОЗВРАТ В ИГРУ ПОСЛЕ ШЕРИНГА
-    function resetGameAfterSharing() {
-      document.getElementById('game').innerHTML = `
-        <div class="loading" style="margin: 40px 0;">
-          ✅ Возвращаюсь в игру...
-        </div>
-      `;
-      
-      setTimeout(() => {
-        isSharing = false;
-        showRandomStory();
-      }, 1500);
-    }
-
-    function showPremium() {
-      const premiumIds = Object.keys(STORIES).filter(id => 
-        Object.values(STORIES[id].options).some(opt => opt.premium)
-      );
-      if (premiumIds.length > 0) {
-        const randomId = premiumIds[Math.floor(Math.random() * premiumIds.length)];
-        showRandomStory(randomId);
-      }
-    }
-
-    function premiumStub(storyId, choice) {
-      alert('✨ Премиум-истории скоро будут доступны во ВКонтакте!');
-      showResult(storyId, choice);
-    }
-
-    function triggerConfetti() {
-      const confettiContainer = document.getElementById('confetti');
-      confettiContainer.innerHTML = '';
-      confettiContainer.style.opacity = '1';
-      
-      for (let i = 0; i < 50; i++) {
-        const emoji = ['🎉', '💎', '✨', '🚀', '👑'][Math.floor(Math.random() * 5)];
-        const confetti = document.createElement('div');
-        confetti.textContent = emoji;
-        Object.assign(confetti.style, {
-          position: 'absolute',
-          fontSize: (Math.random() * 20 + 10) + 'px',
-          left: Math.random() * 100 + 'vw',
-          top: '-20px',
-          opacity: String(Math.random()),
-          zIndex: '100'
-        });
-        confettiContainer.appendChild(confetti);
-        
-        const duration = Math.random() * 3 + 2;
-        confetti.animate([
-          { transform: 'translateY(0) rotate(0deg)', opacity: '1' },
-          { 
-            transform: `translateY(${window.innerHeight}px) rotate(${360 * (Math.random() > 0.5 ? 1 : -1)}deg)`, 
-            opacity: '0' 
-          }
-        ], {
-          duration: duration * 1000,
-          easing: 'cubic-bezier(0,0.5,0.5,1)'
-        });
-      }
-      
-      setTimeout(() => {
-        confettiContainer.style.opacity = '0';
-      }, 5000);
-    }
-
-    function showDemoNote() {
-      const note = document.createElement('div');
-      note.className = 'demo-note';
-      note.innerHTML = '💡 Локальный демо-режим<br>Во ВКонтакте будет кнопка «Поделиться»';
-      document.querySelector('.container').appendChild(note);
-    }
-
-    // ИНИЦИАЛИЗАЦИЯ
+    // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
     async function initApp() {
-      const vkParams = getVKParams();
-      const isRealVK = vkParams.vk_user_id && vkParams.vk_app_id;
+      updateStatus('🔄 Инициализация...');
       
-      console.log('🔄 Инициализация приложения...');
-      console.log('📊 VK параметры:', vkParams);
-      console.log('✅ APP_ID:', APP_ID);
-      console.log('🌐 В VK:', isInVK());
-      
-      if (isRealVK) {
+      if (isInVK()) {
+        updateStatus('✅ Обнаружен VK');
+        
         try {
-          const bridge = await loadVKBridge();
-          if (bridge) {
-            await bridge.send('VKWebAppInit');
-            
-            // Безопасное получение данных пользователя
-            try {
-              const user = await bridge.send('VKWebAppGetUserInfo');
-              userId = user.id || 'vk_user';
-              console.log('✅ VK Bridge инициализирован, пользователь:', userId);
-            } catch (e) {
-              console.log('Пользователь не авторизован, используем демо ID', e);
-              userId = 'demo_vk_user';
+          // Загружаем VK Bridge
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js';
+          script.onload = async () => {
+            if (window.vkBridge) {
+              updateStatus('✅ VK Bridge загружен');
+              
+              // Инициализируем приложение
+              await window.vkBridge.send('VKWebAppInit', {});
+              updateStatus('✅ Приложение готово');
+              
+              // Получаем ID пользователя
+              try {
+                const userInfo = await window.vkBridge.send('VKWebAppGetUserInfo');
+                userId = userInfo.id;
+                updateStatus(`👤 Пользователь: ${userInfo.first_name}`);
+              } catch (e) {
+                console.log('Не удалось получить информацию о пользователе');
+              }
+              
+              // Показываем игру
+              showRandomStory();
+              updateStatus('');
+            } else {
+              updateStatus('❌ VK Bridge не загрузился');
+              showRandomStory();
             }
-          }
-        } catch (e) {
-          console.log('VK инициализация с ошибкой, переключаемся в демо-режим', e);
-          userId = 'demo123';
+          };
+          
+          script.onerror = () => {
+            updateStatus('❌ Ошибка загрузки VK Bridge');
+            showRandomStory();
+          };
+          
+          document.head.appendChild(script);
+          
+        } catch (error) {
+          console.error('Ошибка инициализации:', error);
+          updateStatus('❌ Ошибка инициализации');
+          showRandomStory();
         }
       } else {
-        console.log('✅ Режим: Демо (не в VK)');
+        updateStatus('🌐 Режим: Демо (не в VK)');
+        showRandomStory();
       }
-      
-      showRandomStory();
-      if (!isRealVK) showDemoNote();
     }
 
-    // ЗАПУСК
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('✅ Игра запускается...');
-      console.log('✅ Адрес приложения: https://husia.github.io/sudba-vk/');
-      
-      // Запускаем инициализацию
-      initApp();
-    });
-    
-    // ДОПОЛНИТЕЛЬНАЯ ЗАЩИТА: если пользователь закрыл страницу во время шеринга
-    window.addEventListener('beforeunload', (e) => {
-      if (isSharing) {
-        e.preventDefault();
-        e.returnValue = 'Вы публикуете историю. Если вы покинете страницу, публикация может не завершиться.';
-      }
-    });
+    // ЗАПУСК ПРИЛОЖЕНИЯ
+    document.addEventListener('DOMContentLoaded', initApp);
   </script>
 </body>
 </html>
