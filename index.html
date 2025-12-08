@@ -10,7 +10,7 @@
     default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com https://sun9-78.userapi.com;
     script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
     style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
-    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com https://vkuserimages.com data:;
+    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com https://vkuserimages.com ;
     connect-src 'self' https://*.vk.com https://api.vk.com https://husia.github.io https://vk.com https://unpkg.com;
     frame-src 'self' https://*.vk.com https://vk.com;
     child-src 'self' https://*.vk.com https://vk.com;
@@ -237,6 +237,33 @@
     .share-instruction li {
       margin-bottom: 8px;
       line-height: 1.5;
+    }
+    .modal-footer {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-copy {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-copy:hover {
+      opacity: 0.9;
+    }
+    .link-preview {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 14px;
+      word-break: break-all;
+      color: #333;
     }
   </style>
 </head>
@@ -490,7 +517,14 @@
       document.getElementById('modal-container').innerHTML = '';
     }
 
-    function showShareInstruction() {
+    function showShareModal() {
+      const currentTitle = getTitle(document.querySelector('.result').textContent);
+      const link = isInVK() 
+        ? `https://vk.com/app${APP_ID}?ref=${userId}`
+        : `https://vk.com/app5198765432?ref=demo123`;
+      const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇`;
+      const fullText = `${shareText}\n\n${link}`;
+      
       const modalContainer = document.getElementById('modal-container');
       modalContainer.innerHTML = `
         <div class="overlay" onclick="closeErrorModal()"></div>
@@ -499,82 +533,36 @@
           <div class="share-instruction">
             <p>ВКонтакте не позволяет Mini Apps автоматически отправлять сообщения. Но вы можете легко поделиться вручную:</p>
             <ol>
-              <li>Скопируйте текст ниже</li>
-              <li>Откройте сообщения ВК</li>
-              <li>Выберите друга или чат</li>
-              <li>Вставьте текст и отправьте</li>
+              <li>Нажмите кнопку "Скопировать текст"</li>
+              <li>Откройте диалог с другом в ВК</li>
+              <li>Вставьте скопированный текст и отправьте</li>
             </ol>
+            <div class="link-preview">${fullText}</div>
           </div>
-          <button class="btn-close" onclick="closeErrorModal()">Понятно, продолжить</button>
+          <div class="modal-footer">
+            <button class="btn-copy" onclick="copyShareText('${fullText.replace(/'/g, "\\'")}')">📋 Скопировать текст</button>
+            <button class="btn-close" onclick="closeErrorModal()">Закрыть</button>
+          </div>
         </div>
       `;
     }
 
-    function shareResult() {
-      const link = isInVK() 
-        ? `https://vk.com/app${APP_ID}?ref=${userId}`
-        : `https://vk.com/app5198765432?ref=demo123`;
-      
-      const currentTitle = getTitle(document.querySelector('.result').textContent);
-      const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇`;
-      
-      if (isInVK()) {
-        showShareInstruction();
-        
-        // Загружаем bridge и пробуем открыть диалог шеринга
-        loadVKBridge().then(bridge => {
-          if (!bridge) {
-            fallbackShare(link, shareText);
-            return;
-          }
-          
-          currentBridge = bridge;
-          
-          // Пробуем открыть диалог шеринга
-          bridge.send('VKWebAppShare', {
-            link: link,
-            comment: shareText
-          }).catch(e => {
-            console.log('VKWebAppShare failed, trying story box:', e);
-            
-            // Если шеринг не сработал, пробуем историю
-            bridge.send('VKWebAppShowStoryBox', {
-              background_type: 'image',
-              url: 'https://sun9-78.userapi.com/impg/F9J3j8qWlWq4Q3wBnD9W9u4ZwBkY7QhYxJ5XJg/7Kq9dXZ6Q6c.jpg?size=1280x720&quality=96&type=album',
-              sticker: `🔥 ${currentTitle}!`,
-              action_type: 'link',
-              action_link: link
-            }).catch(e => {
-              console.log('VKWebAppShowStoryBox failed:', e);
-              
-              // Если история не сработала, пробуем открыть пост на стене
-              bridge.send('VKWebAppOpenWallPost', {
-                message: shareText + '\n\n' + link
-              }).catch(e => {
-                console.log('VKWebAppOpenWallPost failed:', e);
-                fallbackShare(link, shareText);
-              });
-            });
-          });
+    function copyShareText(text) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert('✅ Текст скопирован!\n\nТеперь откройте диалог с другом в ВК и вставьте текст.');
+        }).catch(e => {
+          console.error('Failed to copy text:', e);
+          prompt('Скопируйте текст вручную:', text);
         });
       } else {
-        fallbackShare(link, shareText);
+        prompt('Скопируйте текст вручную:', text);
       }
     }
 
-    function fallbackShare(link, message) {
-      const text = `${message}\n\n${link}`;
-      
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-          showErrorModal('✅ Успешно!', 'Ссылка скопирована в буфер обмена!\n\nТеперь:\n1. Открой сообщения ВК\n2. Выбери друга\n3. Вставь текст и отправь');
-        }).catch(e => {
-          console.log('Clipboard error:', e);
-          showErrorModal('📋 Копирование', 'Выдели и скопируй этот текст:\n\n' + text);
-        });
-      } else {
-        showErrorModal('📋 Копирование', 'Выдели и скопируй этот текст:\n\n' + text);
-      }
+    function shareResult() {
+      // Показываем только модальное окно с инструкцией
+      showShareModal();
     }
 
     function showPremium() {
