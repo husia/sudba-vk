@@ -406,6 +406,7 @@
     let userId = 'demo123';
     const APP_ID = '54388761'; // ЗАМЕНИ НА СВОЙ РЕАЛЬНЫЙ APP ID
     let currentBridge = null;
+    let isSharing = false; // Флаг для отслеживания состояния шеринга
 
     // ФУНКЦИИ
     function isInVK() {
@@ -526,46 +527,15 @@
           showErrorModal('✅ Скопировано!', 'Текст скопирован! Теперь вставь его при публикации истории.');
         });
       } else {
-        alert('Скопируй текст для подписи:\n\n' + text);
+        prompt('Скопируй текст для подписи:', text);
       }
     }
 
-    function showManualShareInstructions() {
-      const currentTitle = getTitle(document.querySelector('.result').textContent);
-      const outcomeText = document.querySelector('.result').textContent;
-      const fullResult = `🔥 Я стал: ${currentTitle}!\n\n${outcomeText}\n\nУзнай свою судьбу за 10 секунд 👇`;
-      
-      document.getElementById('game').innerHTML = `
-        <div class="result" id="resultBox">
-          ${document.querySelector('.result').innerHTML}
-        </div>
-        <div class="share-instruction">
-          <h3>📸 Если автоматическое создание не сработало:</h3>
-          <ol>
-            <li>Сделай скриншот этого экрана</li>
-            <li>Открой камеры ВКонтакте</li>
-            <li>Выбери скриншот</li>
-            <li>Опубликуй историю!</li>
-          </ol>
-        </div>
-        <button class="btn btn-share" onclick="copyResultText('${fullResult.replace(/'/g, "\\'")}')">📋 Скопировать текст для подписи</button>
-        <button class="btn btn-free" style="margin-top: 10px;" onclick="resetGameAfterSharing()">🏠 Вернуться в игру</button>
-      `;
-    }
-
-    function resetGameAfterSharing() {
-      document.getElementById('game').innerHTML = `
-        <div class="loading" style="margin: 40px 0;">
-          ✅ История создана! Возвращаюсь в игру...
-        </div>
-      `;
-      
-      setTimeout(() => {
-        showRandomStory();
-      }, 1500);
-    }
-
+    // ОСНОВНАЯ ФУНКЦИЯ ШЕРИНГА С ПРАВИЛЬНОЙ ОБРАБОТКОЙ СОСТОЯНИЙ
     function shareResult() {
+      if (isSharing) return; // Предотвращаем повторные вызовы
+      
+      isSharing = true;
       const currentTitle = getTitle(document.querySelector('.result').textContent);
       const link = isInVK() 
         ? `https://vk.com/app${APP_ID}?ref=${userId}`
@@ -581,8 +551,11 @@
         loadVKBridge().then(bridge => {
           if (!bridge) {
             showManualShareInstructions();
+            isSharing = false;
             return;
           }
+          
+          currentBridge = bridge;
           
           // Показываем лоадер
           document.getElementById('game').innerHTML = `
@@ -594,25 +567,75 @@
           // СОЗДАЕМ ИСТОРИЮ С ТЕКСТОМ
           bridge.send('VKWebAppShowStoryBox', {
             background_type: 'image',
-            // РАБОЧЕЕ ИЗОБРАЖЕНИЕ С VK
+            // РАБОЧЕЕ ИЗОБРАЖЕНИЕ С VK (с правильными параметрами)
             url: 'https://sun9-4.userapi.com/s/v1/ig2/VhFPa-WbwKQ7vBJxNWBWRPVX24livPpD3AbKCFonrnZ7CEeQQtjGkHglBeiS5POyK9Ncjn4OT2JjxPva4NHCQlqc.jpg?quality=95&as=32x57,48x85,72x128,108x192,160x284,240x427,360x640,480x853,540x960,640x1138,720x1280,1080x1920&from=bu&cs=1080x0',
             sticker: stickerText, // КОРОТКИЙ ТЕКСТ ДЛЯ НАКЛЕЙКИ
             action_type: 'link',
             action_link: link
           })
           .then(() => {
-            // ПОЛЬЗОВАТЕЛЬ ЗАКРЫЛ ОКНО ИЛИ ОПУБЛИКОВАЛ ИСТОРИЮ
+            // УСПЕШНОЕ ЗАКРЫТИЕ ОКНА ИСТОРИИ
             resetGameAfterSharing();
           })
           .catch(error => {
             console.log('Story creation failed:', error);
-            // Если ошибка - показываем ручной способ
-            showManualShareInstructions();
+            
+            // ОБРАБОТКА ОШИБОК С ПРАВИЛЬНЫМ СООБЩЕНИЕМ
+            showErrorModal('📱 История не создана', 'Возможно, нужно разрешить создание историй в настройках ВКонтакте. Не переживай, мы подготовили простой способ поделиться своей судьбой!');
+            
+            setTimeout(() => {
+              showManualShareInstructions();
+            }, 3000);
+          })
+          .finally(() => {
+            isSharing = false;
           });
         });
       } else {
         showManualShareInstructions();
+        isSharing = false;
       }
+    }
+
+    // ФУНКЦИЯ ДЛЯ РУЧНОГО ШЕРИНГА (СКРИНШОТЫ)
+    function showManualShareInstructions() {
+      const currentTitle = getTitle(document.querySelector('.result').textContent);
+      const outcomeText = document.querySelector('.result').textContent;
+      const fullResult = `🔥 Я стал: ${currentTitle}!\n\n${outcomeText}\n\nУзнай свою судьбу за 10 секунд 👇`;
+      
+      document.getElementById('game').innerHTML = `
+        <div class="result" id="resultBox">
+          ${document.querySelector('.result').innerHTML}
+        </div>
+        <div class="share-instruction">
+          <h3>📸 Как поделиться в историях</h3>
+          <ol>
+            <li>Сделайте скриншот этого экрана (кнопка Print Screen или скриншот в телефоне)</li>
+            <li>Откройте камеры ВКонтакте</li>
+            <li>Выберите сделанный скриншот</li>
+            <li>В описание скопируйте текст ниже и опубликуйте</li>
+          </ol>
+          <div class="link-preview" style="background: #f8f9fa; color: #333; padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; text-align: left;">
+            ${fullResult}
+          </div>
+        </div>
+        <button class="btn btn-share" onclick="copyResultText('${fullResult.replace(/'/g, "\\'")}')">📋 Скопировать текст для подписи</button>
+        <button class="btn btn-free" style="margin-top: 10px;" onclick="resetGameAfterSharing()">🏠 Вернуться в игру</button>
+      `;
+    }
+
+    // ВОЗВРАТ В ИГРУ ПОСЛЕ ШЕРИНГА
+    function resetGameAfterSharing() {
+      document.getElementById('game').innerHTML = `
+        <div class="loading" style="margin: 40px 0;">
+          ✅ История создана! Возвращаюсь в игру...
+        </div>
+      `;
+      
+      setTimeout(() => {
+        isSharing = false;
+        showRandomStory();
+      }, 1500);
     }
 
     function showPremium() {
@@ -626,7 +649,7 @@
     }
 
     function premiumStub(storyId, choice) {
-      showErrorModal('✨ Премиум-истории', 'Премиум-истории скоро будут доступны во ВКонтакте!');
+      alert('✨ Премиум-истории скоро будут доступны во ВКонтакте!');
       showResult(storyId, choice);
     }
 
@@ -674,7 +697,7 @@
       document.querySelector('.container').appendChild(note);
     }
 
-    // ЗАГРУЗКА VK BRIDGE (РАБОЧАЯ ВЕРСИЯ)
+    // ЗАГРУЗКА VK BRIDGE С ОБРАБОТКОЙ ЗАКРЫТИЯ ОКНА
     function loadVKBridge() {
       return new Promise((resolve) => {
         if (window.vkBridge) {
@@ -697,6 +720,16 @@
           if (window.vkBridge) {
             // Отключаем статистику
             if (window.vkBridge.on) {
+              window.vkBridge.on('VKWebAppUpdateConfig', (data) => {
+                console.log('VK config updated:', data);
+                
+                // Обрабатываем закрытие модального окна
+                if (data && data.event_type === 'StoryBoxClosed') {
+                  console.log('Story box closed by user');
+                  resetGameAfterSharing();
+                }
+              });
+              
               window.vkBridge.on('VKWebAppConversionHit', (data) => {
                 console.log('📊 Статистика отключена');
                 return false;
@@ -754,6 +787,14 @@
       
       // Запускаем инициализацию
       initApp();
+    });
+    
+    // ДОПОЛНИТЕЛЬНАЯ ЗАЩИТА: если пользователь закрыл страницу во время шеринга
+    window.addEventListener('beforeunload', (e) => {
+      if (isSharing) {
+        e.preventDefault();
+        e.returnValue = 'Вы публикуете историю. Если вы покинете страницу, публикация может не завершиться.';
+      }
     });
   </script>
 </body>
