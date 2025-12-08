@@ -10,7 +10,7 @@
     default-src 'self' https://*.vk.com https://*.vk-portal.net https://api.vk.com https://unpkg.com https://vk.com https://i.imgur.com https://sun9-78.userapi.com;
     script-src 'self' 'unsafe-inline' https://unpkg.com https://*.vk.com https://vk.com;
     style-src 'self' 'unsafe-inline' https://*.vk.com https://vk.com;
-    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com data:;
+    img-src 'self' https://*.vk.com https://*.vk-portal.net https://vk.com https://i.imgur.com https://sun9-78.userapi.com https://vkuserimages.com data:;
     connect-src 'self' https://*.vk.com https://api.vk.com https://husia.github.io https://vk.com https://unpkg.com;
     frame-src 'self' https://*.vk.com https://vk.com;
     child-src 'self' https://*.vk.com https://vk.com;
@@ -176,7 +176,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.98);
       color: #333;
       padding: 20px;
       border-radius: 16px;
@@ -184,23 +184,32 @@
       z-index: 1000;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       text-align: center;
+      border: 2px solid #ff4b2b;
     }
     .error-modal h3 {
       color: #ff4b2b;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      font-size: 20px;
     }
     .error-modal p {
-      margin-bottom: 15px;
-      line-height: 1.5;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      color: #555;
     }
     .error-modal .btn-close {
       background: linear-gradient(45deg, #6a11cb, #2575fc);
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 12px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+    .error-modal .btn-close:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(106, 17, 203, 0.4);
     }
     .overlay {
       position: fixed;
@@ -210,6 +219,24 @@
       height: 100%;
       background: rgba(0,0,0,0.7);
       z-index: 999;
+    }
+    .share-instruction {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 16px;
+      padding: 20px;
+      color: #333;
+      max-width: 500px;
+      margin: 20px auto;
+      border: 1px solid #ffd700;
+      text-align: left;
+    }
+    .share-instruction ol {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+    .share-instruction li {
+      margin-bottom: 8px;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -447,7 +474,6 @@
 
     function showErrorModal(title, message) {
       const modalContainer = document.getElementById('modal-container');
-      
       modalContainer.innerHTML = `
         <div class="overlay" onclick="closeErrorModal()"></div>
         <div class="error-modal">
@@ -456,95 +482,98 @@
           <button class="btn-close" onclick="closeErrorModal()">Понятно</button>
         </div>
       `;
-      
-      // Скрываем через 5 секунд
-      setTimeout(closeErrorModal, 5000);
+      // Скрываем через 8 секунд
+      setTimeout(closeErrorModal, 8000);
     }
 
     function closeErrorModal() {
       document.getElementById('modal-container').innerHTML = '';
     }
 
+    function showShareInstruction() {
+      const modalContainer = document.getElementById('modal-container');
+      modalContainer.innerHTML = `
+        <div class="overlay" onclick="closeErrorModal()"></div>
+        <div class="error-modal">
+          <h3>📱 Как поделиться своей судьбой</h3>
+          <div class="share-instruction">
+            <p>ВКонтакте не позволяет Mini Apps автоматически отправлять сообщения. Но вы можете легко поделиться вручную:</p>
+            <ol>
+              <li>Скопируйте текст ниже</li>
+              <li>Откройте сообщения ВК</li>
+              <li>Выберите друга или чат</li>
+              <li>Вставьте текст и отправьте</li>
+            </ol>
+          </div>
+          <button class="btn-close" onclick="closeErrorModal()">Понятно, продолжить</button>
+        </div>
+      `;
+    }
+
     function shareResult() {
       const link = isInVK() 
         ? `https://vk.com/app${APP_ID}?ref=${userId}`
-        : `https://vk.com/app${APP_ID}?ref=demo123`;
+        : `https://vk.com/app5198765432?ref=demo123`;
       
       const currentTitle = getTitle(document.querySelector('.result').textContent);
-      const message = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇`;
+      const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇`;
       
       if (isInVK()) {
+        showShareInstruction();
+        
+        // Загружаем bridge и пробуем открыть диалог шеринга
         loadVKBridge().then(bridge => {
-          if (!bridge) return fallbackShare(link, message);
+          if (!bridge) {
+            fallbackShare(link, shareText);
+            return;
+          }
           
           currentBridge = bridge;
           
-          // Способ 1: Открыть диалог выбора друзей с сообщением
-          bridge.send('VKWebAppAllowMessagesFromGroup', {
-            group_id: 1, // Любое число, не используется
-            key: 'allow_messages'
-          })
-          .then(() => {
-            // После разрешения - показываем диалог отправки
-            bridge.send('VKWebAppShare', {
-              link: link,
-              comment: message
-            });
-          })
-          .catch(e => {
-            console.log('VKWebAppAllowMessagesFromGroup failed:', e);
+          // Пробуем открыть диалог шеринга
+          bridge.send('VKWebAppShare', {
+            link: link,
+            comment: shareText
+          }).catch(e => {
+            console.log('VKWebAppShare failed, trying story box:', e);
             
-            // Пытаемся открыть историю с новым, рабочим изображением
+            // Если шеринг не сработал, пробуем историю
             bridge.send('VKWebAppShowStoryBox', {
               background_type: 'image',
-              url: 'https://sun9-78.userapi.com/impg/F9J3j8qWlWq4Q3wBnD9W9u4ZwBkY7QhYxJ5XJg/7Kq9dXZ6Q6c.jpg?size=1280x720&quality=96&type=album', // Рабочее изображение
+              url: 'https://sun9-78.userapi.com/impg/F9J3j8qWlWq4Q3wBnD9W9u4ZwBkY7QhYxJ5XJg/7Kq9dXZ6Q6c.jpg?size=1280x720&quality=96&type=album',
               sticker: `🔥 ${currentTitle}!`,
               action_type: 'link',
               action_link: link
             }).catch(e => {
               console.log('VKWebAppShowStoryBox failed:', e);
               
-              // Пытаемся открыть пост на стене
+              // Если история не сработала, пробуем открыть пост на стене
               bridge.send('VKWebAppOpenWallPost', {
-                owner_id: userId,
-                message: message + '\n\n' + link,
-                attachments: link
+                message: shareText + '\n\n' + link
               }).catch(e => {
                 console.log('VKWebAppOpenWallPost failed:', e);
-                
-                // Альтернативный метод - копирование ссылки
-                showErrorModal('Не удалось отправить', 'Давай попробуем другой способ. Скопируй ссылку вручную:');
-                fallbackShare(link, message);
+                fallbackShare(link, shareText);
               });
             });
           });
         });
       } else {
-        fallbackShare(link, message);
+        fallbackShare(link, shareText);
       }
     }
 
     function fallbackShare(link, message) {
-      // Создаём красивый текст для копирования
       const text = `${message}\n\n${link}`;
       
-      if (navigator.share) {
-        // Нативный шеринг в мобильных браузерах
-        navigator.share({
-          title: 'Судьба за 10 секунд',
-          text: text
-        }).catch(e => console.log('Share cancelled', e));
-      } else if (navigator.clipboard) {
-        // Копирование в буфер обмена
+      if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-          showErrorModal('✅ Успешно!', 'Ссылка скопирована в буфер обмена. Теперь отправь её другу!');
+          showErrorModal('✅ Успешно!', 'Ссылка скопирована в буфер обмена!\n\nТеперь:\n1. Открой сообщения ВК\n2. Выбери друга\n3. Вставь текст и отправь');
         }).catch(e => {
           console.log('Clipboard error:', e);
-          prompt('Скопируй ссылку и отправь другу:', text);
+          showErrorModal('📋 Копирование', 'Выдели и скопируй этот текст:\n\n' + text);
         });
       } else {
-        // Старый метод
-        prompt('Скопируй ссылку и отправь другу:', text);
+        showErrorModal('📋 Копирование', 'Выдели и скопируй этот текст:\n\n' + text);
       }
     }
 
@@ -559,7 +588,7 @@
     }
 
     function premiumStub(storyId, choice) {
-      alert('✨ Премиум-истории скоро!');
+      showErrorModal('✨ Премиум-истории', 'Премиум-истории скоро будут доступны во ВКонтакте!');
       showResult(storyId, choice);
     }
 
@@ -682,8 +711,7 @@
 
     // ЗАПУСК
     document.addEventListener('DOMContentLoaded', () => {
-      // Проверка статуса VK
-      console.log('✅ Технические работы во ВКонтакте, но игра работает в демо-режиме');
+      console.log('✅ Игра запускается...');
       console.log('✅ Адрес приложения: https://husia.github.io/sudba-vk/');
       
       // Запускаем инициализацию
