@@ -278,6 +278,7 @@
       cursor: pointer;
       border: 2px solid transparent;
       transition: all 0.2s;
+      overflow: hidden;
     }
     .image-option:hover {
       transform: scale(1.05);
@@ -286,6 +287,20 @@
     .image-option.selected {
       border-color: #ff416c;
       box-shadow: 0 0 10px rgba(255, 65, 108, 0.5);
+    }
+    .image-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .svg-bg {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -338,36 +353,36 @@
     const APP_ID = '54388761';
     let isSharing = false;
     
-    // СПИСОК РАБОЧИХ КАРТИНОК
-    const STORY_IMAGES = [
+    // СПИСОК SVG ФОНОВ (100% рабочие)
+    const STORY_BACKGROUNDS = [
       {
         id: 1,
-        url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-        name: 'Космос'
+        name: 'Градиент космос',
+        url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjE5MjAiIHZpZXdCb3g9IjAgMCAxMDgwIDE5MjAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwMGI1ZjsiIC8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDAwMDA7IiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzUwMDBiNTsiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNnKSIvPjxjaXJjbGUgY3g9IjU0MCIgY3k9IjQwMCIgcj0iMzAwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjEiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSI4MDAiIHI9IjIwMCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC4xIi8+PGNpcmNsZSBjeD0iODAwIiBjeT0iMTIwMCIgcj0iMjUwIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjEiLz48L3N2Zz4='
       },
       {
         id: 2,
-        url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-        name: 'Горы'
+        name: 'Неоновый градиент',
+        url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjE5MjAiIHZpZXdCb3g9IjAgMCAxMDgwIDE5MjAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmMDBmZjsiIC8+PHN0b3Agb2Zmc2V0PSIzMyUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDBiZmY7IiAvPjxzdG9wIG9mZnNldD0iNjYlIiBzdHlsZT0ic3RvcC1jb2xvcjojZmYwMGZmOyIgLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDBiZmY7IiAvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjE5MjAiIGZpbGw9InVybCgjZykiLz48L3N2Zz4='
       },
       {
         id: 3,
-        url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-        name: 'Неон'
+        name: 'Огненный фон',
+        url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjE5MjAiIHZpZXdCb3g9IjAgMCAxMDgwIDE5MjAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmNTAwMDsiIC8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZmFhMDA7IiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmNTAwMDsiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0wIDUwMEw1NDAgMTkyMEwxMDgwIDUwMFoiIGZpbGw9IiNmZmZmMDAiIG9wYWNpdHk9IjAuMiIvPjwvc3ZnPg=='
       },
       {
         id: 4,
-        url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-        name: 'Горы 2'
+        name: 'Изумрудный',
+        url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjE5MjAiIHZpZXdCb3g9IjAgMCAxMDgwIDE5MjAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwZmY5OTsiIC8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMGZmZmY7IiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwZmY5OTsiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNnKSIvPjwvc3ZnPg=='
       },
       {
         id: 5,
-        url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-        name: 'Абстракция'
+        name: 'Фиолетовая магия',
+        url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjE5MjAiIHZpZXdCb3g9IjAgMCAxMDgwIDE5MjAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZyI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzZmMTFjYjsiIC8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMyNTc1ZmM7IiAvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzZmMTFjYjsiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0wIDAgTDU0MCA5NjAgTDEwODAgMCIgZmlsbD0iI2ZmMDBmZiIgb3BhY2l0eT0iMC4xIi8+PC9zdmc+'
       }
     ];
     
-    let selectedImageIndex = 0; // Индекс выбранной картинки
+    let selectedBackgroundIndex = 0;
 
     // ФУНКЦИИ
     function isInVK() {
@@ -386,7 +401,7 @@
     }
 
     function showRandomStory() {
-      const storyId = "1"; // Для простоты всегда показываем первую историю
+      const storyId = "1";
       const story = STORIES[storyId];
       
       if (!story) {
@@ -408,27 +423,27 @@
       const outcome = STORIES[storyId].options[choice].outcome;
       const title = getTitle(outcome);
       
-      // Создаем HTML для выбора картинки
-      let imageSelectorHtml = `
+      // Создаем HTML для выбора фона
+      let backgroundSelectorHtml = `
         <div class="image-selector">
           <h3>🎨 Выбери фон для истории</h3>
           <div class="image-options">
       `;
       
-      STORY_IMAGES.forEach((image, index) => {
-        const selectedClass = index === selectedImageIndex ? 'selected' : '';
-        imageSelectorHtml += `
-          <img src="${image.url}" 
-               class="image-option ${selectedClass}" 
-               alt="${image.name}"
-               title="${image.name}"
-               onclick="selectImage(${index})">
+      STORY_BACKGROUNDS.forEach((bg, index) => {
+        const selectedClass = index === selectedBackgroundIndex ? 'selected' : '';
+        backgroundSelectorHtml += `
+          <div class="image-option ${selectedClass}" onclick="selectBackground(${index})" title="${bg.name}">
+            <div class="svg-bg" style="background: url('${bg.url}'); background-size: cover;">
+              ${index + 1}
+            </div>
+          </div>
         `;
       });
       
-      imageSelectorHtml += `
+      backgroundSelectorHtml += `
           </div>
-          <p>Текущий фон: <strong>${STORY_IMAGES[selectedImageIndex].name}</strong></p>
+          <p>Текущий фон: <strong>${STORY_BACKGROUNDS[selectedBackgroundIndex].name}</strong></p>
         </div>
       `;
       
@@ -437,34 +452,34 @@
           ${outcome}
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
-        ${imageSelectorHtml}
-        <button class="btn btn-share" onclick="tryShareResult()">📲 Поделиться в историях</button>
+        ${backgroundSelectorHtml}
+        <button class="btn btn-share" onclick="shareResult()">📲 Поделиться в историях</button>
         <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
       `;
       
       document.getElementById('game').innerHTML = resultHtml;
     }
 
-    function selectImage(index) {
-      selectedImageIndex = index;
+    function selectBackground(index) {
+      selectedBackgroundIndex = index;
       
-      // Обновляем отображение выбранной картинки
+      // Обновляем отображение выбранного фона
       const imageOptions = document.querySelectorAll('.image-option');
-      imageOptions.forEach((img, i) => {
+      imageOptions.forEach((option, i) => {
         if (i === index) {
-          img.classList.add('selected');
+          option.classList.add('selected');
         } else {
-          img.classList.remove('selected');
+          option.classList.remove('selected');
         }
       });
       
-      // Обновляем текст с названием выбранной картинки
+      // Обновляем текст с названием выбранного фона
       const nameElement = document.querySelector('.image-selector p strong');
       if (nameElement) {
-        nameElement.textContent = STORY_IMAGES[index].name;
+        nameElement.textContent = STORY_BACKGROUNDS[index].name;
       }
       
-      updateStatus(`✅ Выбран фон: ${STORY_IMAGES[index].name}`);
+      updateStatus(`✅ Выбран фон: ${STORY_BACKGROUNDS[index].name}`);
     }
 
     function getTitle(outcome) {
@@ -477,45 +492,30 @@
       return "Тайная личность";
     }
 
-    function showErrorModal(title, message) {
-      const modalContainer = document.getElementById('modal-container');
-      modalContainer.innerHTML = `
-        <div class="overlay" onclick="closeErrorModal()"></div>
-        <div class="error-modal">
-          <h3>${title}</h3>
-          <p>${message}</p>
-          <button class="btn-close" onclick="closeErrorModal()">Понятно</button>
-        </div>
-      `;
-    }
-
-    function closeErrorModal() {
-      document.getElementById('modal-container').innerHTML = '';
-    }
-
-    // ПРОСТАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА (без attachment)
-    async function shareResultSimple() {
-      if (isSharing) return false;
+    // ФУНКЦИЯ ДЛЯ ШЕРИНГА
+    async function shareResult() {
+      if (isSharing) return;
       isSharing = true;
       
-      const selectedImage = STORY_IMAGES[selectedImageIndex];
-      updateStatus(`🔄 Создаю историю с фоном "${selectedImage.name}"...`);
+      const selectedBg = STORY_BACKGROUNDS[selectedBackgroundIndex];
+      updateStatus(`🔄 Создаю историю с фоном "${selectedBg.name}"...`);
       
       try {
         // Проверяем, есть ли VK Bridge
         if (!window.vkBridge) {
           updateStatus('❌ VK Bridge не загружен');
-          return false;
+          showManualShareInstructions();
+          return;
         }
         
         // Инициализируем приложение
         await window.vkBridge.send('VKWebAppInit', {});
         updateStatus('✅ Приложение инициализировано');
         
-        // Создаем историю с выбранной картинкой
+        // Создаем историю с выбранным фоном
         const storyParams = {
           background_type: 'image',
-          url: selectedImage.url // Используем выбранную картинку
+          url: selectedBg.url // Используем SVG как изображение
         };
         
         updateStatus('🔄 Отправляю запрос на создание истории...');
@@ -524,10 +524,13 @@
         if (result) {
           updateStatus('✅ История создана!');
           console.log('История создана:', result);
-          return true;
+          
+          setTimeout(() => {
+            alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.\n\nСовет: Вы можете добавить текст к истории в редакторе VK!');
+            showRandomStory();
+            updateStatus('');
+          }, 1000);
         }
-        
-        return false;
         
       } catch (error) {
         console.error('Ошибка создания истории:', error);
@@ -542,62 +545,10 @@
         }
         
         updateStatus(`❌ Ошибка: ${errorMessage}`);
-        return false;
+        showManualShareInstructions();
+        
       } finally {
         isSharing = false;
-      }
-    }
-
-    // ПОПЫТКА С ПРАВИЛЬНЫМ ATTACHMENT
-    async function shareResultWithAttachment() {
-      try {
-        if (!window.vkBridge) return false;
-        
-        await window.vkBridge.send('VKWebAppInit', {});
-        
-        const selectedImage = STORY_IMAGES[selectedImageIndex];
-        
-        // Используем правильный тип кнопки "play" для игр
-        const storyParams = {
-          background_type: 'image',
-          url: selectedImage.url,
-          attachment: {
-            text: 'play', // Правильный тип для игр
-            url: `https://vk.com/app${APP_ID}`
-          }
-        };
-        
-        const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
-        return !!result;
-      } catch (error) {
-        console.log('Метод с attachment не сработал:', error);
-        return false;
-      }
-    }
-
-    // ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА
-    async function tryShareResult() {
-      updateStatus('🔄 Пробую создать историю...');
-      
-      // Пробуем простой метод (без attachment)
-      let success = await shareResultSimple();
-      
-      // Если не получилось, пробуем с attachment
-      if (!success) {
-        updateStatus('🔄 Пробую другой метод...');
-        success = await shareResultWithAttachment();
-      }
-      
-      if (success) {
-        updateStatus('✅ История успешно создана!');
-        setTimeout(() => {
-          alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.\n\nСовет: Вы можете добавить текст к истории в редакторе VK!');
-          showRandomStory();
-          updateStatus('');
-        }, 1000);
-      } else {
-        updateStatus('❌ Не удалось создать историю автоматически');
-        showManualShareInstructions();
       }
     }
 
@@ -606,7 +557,7 @@
       const shareUrl = `https://vk.com/app${APP_ID}`;
       const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇\n${shareUrl}`;
       
-      const selectedImage = STORY_IMAGES[selectedImageIndex];
+      const selectedBg = STORY_BACKGROUNDS[selectedBackgroundIndex];
       
       document.getElementById('game').innerHTML = `
         <div class="result" id="resultBox">
@@ -614,16 +565,14 @@
         </div>
         <div class="share-instruction">
           <h3>📸 Как поделиться в историях</h3>
-          <p>Автоматическое создание истории временно недоступно.</p>
+          <p>Используйте эту ссылку для фона:</p>
+          <div class="link-preview" style="font-size: 12px; word-break: break-all;">${selectedBg.url.substring(0, 100)}...</div>
           <ol>
             <li>Сделайте скриншот этого экрана</li>
             <li>Откройте ВКонтакте и нажмите "Создать историю"</li>
             <li>Добавьте скриншот и текст ниже:</li>
           </ol>
           <div class="link-preview">${shareText}</div>
-          <p>Или используйте эту картинку как фон:</p>
-          <img src="${selectedImage.url}" style="width: 100%; border-radius: 10px; margin: 10px 0;">
-          <p><em>Нажмите на картинку, чтобы открыть в полном размере, затем сохраните её</em></p>
         </div>
         <button class="btn btn-copy" onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n')}')">📋 Скопировать текст</button>
         <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
