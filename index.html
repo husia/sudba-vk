@@ -121,13 +121,6 @@
       font-weight: bold;
       background: rgba(255,255,255,0.2);
     }
-    .friends {
-      background: rgba(0,0,0,0.2);
-      padding: 16px;
-      border-radius: 16px;
-      margin: 16px 0;
-      font-style: italic;
-    }
     .confetti {
       position: fixed;
       top: 0;
@@ -143,108 +136,10 @@
       font-size: 14px;
       opacity: 0.8;
     }
-    .demo-note {
-      background: rgba(0,0,0,0.3);
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 14px;
-      margin-top: 15px;
-    }
     .loading {
       font-size: 20px;
       margin: 40px 0;
       animation: pulse 1.5s infinite;
-    }
-    .error-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.98);
-      color: #333;
-      padding: 20px;
-      border-radius: 16px;
-      max-width: 400px;
-      z-index: 1000;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      text-align: center;
-      border: 2px solid #ff4b2b;
-    }
-    .error-modal h3 {
-      color: #ff4b2b;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-    .error-modal p {
-      margin-bottom: 20px;
-      line-height: 1.6;
-      color: #555;
-    }
-    .error-modal .btn-close {
-      background: linear-gradient(45deg, #6a11cb, #2575fc);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 16px;
-      transition: all 0.2s;
-    }
-    .error-modal .btn-close:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 10px rgba(106, 17, 203, 0.4);
-    }
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 999;
-    }
-    .share-instruction {
-      background: rgba(0,0,0,0.2);
-      padding: 15px;
-      border-radius: 12px;
-      margin: 15px 0;
-    }
-    .share-instruction h3 {
-      color: #ffd700;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-    .share-instruction ol {
-      text-align: left;
-      margin-left: 20px;
-      margin-top: 10px;
-      margin-bottom: 5px;
-    }
-    .share-instruction li {
-      margin-bottom: 5px;
-      line-height: 1.4;
-    }
-    .btn-copy {
-      background: linear-gradient(45deg, #4CAF50, #8BC34A);
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .btn-copy:hover {
-      opacity: 0.9;
-    }
-    .link-preview {
-      background: #f5f5f5;
-      border-radius: 8px;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 14px;
-      word-break: break-all;
-      color: #333;
     }
     .status {
       margin-top: 20px;
@@ -253,65 +148,45 @@
       border-radius: 10px;
       font-size: 14px;
     }
-    .image-selector {
-      background: rgba(0,0,0,0.2);
-      padding: 15px;
-      border-radius: 12px;
-      margin: 15px 0;
+    .share-dialog {
+      background: rgba(0,0,0,0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+      animation: fadeIn 0.5s ease-out;
     }
-    .image-selector h3 {
+    .share-dialog h3 {
       color: #ffd700;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-    .image-options {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-    .image-option {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.2s;
-      overflow: hidden;
-      background: linear-gradient(45deg, #6a11cb, #2575fc);
-    }
-    .image-option:hover {
-      transform: scale(1.05);
-      border-color: #ffcc00;
-    }
-    .image-option.selected {
-      border-color: #ff416c;
-      box-shadow: 0 0 10px rgba(255, 65, 108, 0.5);
-    }
-    .image-preview {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .bg-preview {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
+      margin-bottom: 15px;
       font-size: 20px;
-      color: white;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
-    .permission-note {
-      background: rgba(255, 215, 0, 0.2);
+    .share-dialog p {
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    .share-steps {
+      text-align: left;
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+    .share-steps li {
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .btn-try-again {
+      background: linear-gradient(45deg, #4CAF50, #8BC34A);
+      color: white;
+    }
+    .btn-back {
+      background: linear-gradient(45deg, #6a11cb, #2575fc);
+      color: white;
+    }
+    .permission-request {
+      background: rgba(255, 215, 0, 0.1);
       border: 1px solid #ffd700;
-      border-radius: 10px;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 14px;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
     }
   </style>
 </head>
@@ -363,52 +238,6 @@
     let userId = 'demo123';
     const APP_ID = '54388761';
     let isSharing = false;
-    
-    // СПИСОК SVG ФОНОВ (100% рабочие Data URLs)
-    const STORY_BACKGROUNDS = [
-      {
-        id: 1,
-        name: 'Космический градиент',
-        color1: '#000b5f',
-        color2: '#000000',
-        color3: '#5000b5',
-        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTA4MCAxOTIwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwMGI1ZjsiLz48c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwMDAwMDsiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM1MDAwYjU7Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg=='
-      },
-      {
-        id: 2,
-        name: 'Неоновый взрыв',
-        color1: '#ff00ff',
-        color2: '#000bff',
-        color3: '#ff00ff',
-        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTA4MCAxOTIwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmMDBmZjsiLz48c3RvcCBvZmZzZXQ9IjMzJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwMGJmZjsiLz48c3RvcCBvZmZzZXQ9IjY2JSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmMDBmZjsiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDBiZmY7Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg=='
-      },
-      {
-        id: 3,
-        name: 'Огненная лава',
-        color1: '#ff5000',
-        color2: '#ffaa00',
-        color3: '#ff5000',
-        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTA4MCAxOTIwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmNTAwMDsiLz48c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmYWEwMDsiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmZjUwMDA7Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg=='
-      },
-      {
-        id: 4,
-        name: 'Изумрудный океан',
-        color1: '#00ff99',
-        color2: '#00ffff',
-        color3: '#00ff99',
-        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTA4MCAxOTIwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwZmY5OTsiLz48c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwZmZmZjsiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMGZmOTk7Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg=='
-      },
-      {
-        id: 5,
-        name: 'Фиолетовая магия',
-        color1: '#6a11cb',
-        color2: '#2575fc',
-        color3: '#6a11cb',
-        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxOTIwIiB2aWV3Qm94PSIwIDAgMTA4MCAxOTIwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iYSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzZmMTFjYjsiLz48c3RvcCBvZmZzZXQ9IjUwJSIgc3R5bGU9InN0b3AtY29sb3I6IzI1NzVmYzsiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM2ZjExY2I7Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwODAiIGhlaWdodD0iMTkyMCIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg=='
-      }
-    ];
-    
-    let selectedBackgroundIndex = 0;
 
     // ФУНКЦИИ
     function isInVK() {
@@ -449,68 +278,20 @@
       const outcome = STORIES[storyId].options[choice].outcome;
       const title = getTitle(outcome);
       
-      // Создаем HTML для выбора фона
-      let backgroundSelectorHtml = `
-        <div class="image-selector">
-          <h3>🎨 Выбери фон для истории</h3>
-          <div class="image-options">
-      `;
-      
-      STORY_BACKGROUNDS.forEach((bg, index) => {
-        const selectedClass = index === selectedBackgroundIndex ? 'selected' : '';
-        const gradientStyle = `background: linear-gradient(135deg, ${bg.color1}, ${bg.color2}, ${bg.color3});`;
-        backgroundSelectorHtml += `
-          <div class="image-option ${selectedClass}" onclick="selectBackground(${index})" title="${bg.name}">
-            <div class="bg-preview" style="${gradientStyle}">
-              ${index + 1}
-            </div>
-          </div>
-        `;
-      });
-      
-      backgroundSelectorHtml += `
-          </div>
-          <p>Текущий фон: <strong>${STORY_BACKGROUNDS[selectedBackgroundIndex].name}</strong></p>
-        </div>
-        <div class="permission-note">
-          <strong>⚠️ Важно!</strong> При создании истории VK запросит разрешение.<br>
-          Нажмите <strong>"Разрешить"</strong>, чтобы история создалась успешно.
-        </div>
-      `;
-      
       const resultHtml = `
         <div class="result" id="resultBox">
           ${outcome}
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
-        ${backgroundSelectorHtml}
-        <button class="btn btn-share" onclick="shareResult()">📲 Поделиться в историях</button>
+        <div class="permission-request">
+          <strong>📢 Важно!</strong> При создании истории VK может запросить разрешение.<br>
+          Если увидите окно "Разрешить доступ" - нажмите <strong>"Разрешить"</strong>.
+        </div>
+        <button class="btn btn-share" onclick="createStory()">📲 Поделиться в историях</button>
         <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
       `;
       
       document.getElementById('game').innerHTML = resultHtml;
-    }
-
-    function selectBackground(index) {
-      selectedBackgroundIndex = index;
-      
-      // Обновляем отображение выбранного фона
-      const imageOptions = document.querySelectorAll('.image-option');
-      imageOptions.forEach((option, i) => {
-        if (i === index) {
-          option.classList.add('selected');
-        } else {
-          option.classList.remove('selected');
-        }
-      });
-      
-      // Обновляем текст с названием выбранного фона
-      const nameElement = document.querySelector('.image-selector p strong');
-      if (nameElement) {
-        nameElement.textContent = STORY_BACKGROUNDS[index].name;
-      }
-      
-      updateStatus(`✅ Выбран фон: ${STORY_BACKGROUNDS[index].name}`);
     }
 
     function getTitle(outcome) {
@@ -523,19 +304,18 @@
       return "Тайная личность";
     }
 
-    // ФУНКЦИЯ ДЛЯ ШЕРИНГА С УЛУЧШЕННОЙ ОБРАБОТКОЙ ОШИБОК
-    async function shareResult() {
+    // ФУНКЦИЯ СОЗДАНИЯ ИСТОРИИ С ПРОСТЫМ ЦВЕТНЫМ ФОНОМ
+    async function createStory() {
       if (isSharing) return;
       isSharing = true;
       
-      const selectedBg = STORY_BACKGROUNDS[selectedBackgroundIndex];
-      updateStatus(`🔄 Создаю историю с фоном "${selectedBg.name}"...`);
+      updateStatus('🔄 Пытаюсь создать историю...');
       
       try {
         // Проверяем, есть ли VK Bridge
         if (!window.vkBridge) {
           updateStatus('❌ VK Bridge не загружен');
-          showManualShareInstructions();
+          showShareInstructions();
           return;
         }
         
@@ -543,16 +323,33 @@
         await window.vkBridge.send('VKWebAppInit', {});
         updateStatus('✅ Приложение инициализировано');
         
-        // Создаем историю с выбранным фоном
+        // Сначала запросим разрешение на публикацию историй
+        // Попробуем использовать VKWebAppAllowMessagesFromGroup для запроса разрешений
+        try {
+          updateStatus('🔄 Запрашиваю разрешения...');
+          await window.vkBridge.send('VKWebAppAllowMessagesFromGroup', {
+            group_id: 0, // 0 означает запрос общих разрешений
+          });
+        } catch (permError) {
+          console.log('Не удалось запросить разрешения:', permError);
+          // Продолжаем без разрешений
+        }
+        
+        // Создаем простую цветную историю без внешних картинок
+        const currentTitle = getTitle(document.querySelector('.result').textContent);
+        const storyText = `🔥 Я стал: ${currentTitle}!`;
+        
+        // Используем простой цветной фон вместо картинки
         const storyParams = {
-          background_type: 'image',
-          url: selectedBg.url
+          background_type: 'none', // Используем цветной фон
+          text: storyText,
+          locked: false
         };
         
-        updateStatus('🔄 Запрашиваю разрешение...');
+        updateStatus('🔄 Создаю историю...');
         const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
         
-        if (result) {
+        if (result && result.result) {
           updateStatus('✅ История создана!');
           console.log('История создана:', result);
           
@@ -562,8 +359,7 @@
             updateStatus('');
           }, 1000);
         } else {
-          updateStatus('❌ История не создана');
-          showPermissionDeniedInstructions();
+          throw new Error('История не создана');
         }
         
       } catch (error) {
@@ -583,11 +379,11 @@
         
         updateStatus(`❌ Ошибка: ${errorMessage}`);
         
-        // Специальная обработка для "User denied"
+        // Если ошибка "User denied", покажем инструкции
         if (errorCode === 4 || errorMessage.includes('denied') || errorMessage.includes('отказано')) {
-          showPermissionDeniedInstructions();
+          showShareInstructions(true);
         } else {
-          showManualShareInstructions();
+          showShareInstructions(false);
         }
         
       } finally {
@@ -595,72 +391,62 @@
       }
     }
 
-    function showPermissionDeniedInstructions() {
+    function showShareInstructions(isPermissionDenied) {
       const currentTitle = getTitle(document.querySelector('.result').textContent);
       const shareUrl = `https://vk.com/app${APP_ID}`;
       const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇\n${shareUrl}`;
       
-      const selectedBg = STORY_BACKGROUNDS[selectedBackgroundIndex];
+      let dialogTitle = '📸 Как поделиться в историях';
+      let dialogMessage = '';
       
-      document.getElementById('game').innerHTML = `
-        <div class="result" id="resultBox">
-          ${document.querySelector('.result').innerHTML}
-        </div>
-        <div class="share-instruction">
-          <h3>⚠️ Разрешение не предоставлено</h3>
-          <p>Вы отказались от создания истории. Это нормально!</p>
-          <p>Вы можете:</p>
-          <ol>
-            <li><strong>Попробовать ещё раз</strong> и нажать "Разрешить"</li>
-            <li><strong>Или поделиться вручную:</strong></li>
+      if (isPermissionDenied) {
+        dialogTitle = '⚠️ Требуется разрешение';
+        dialogMessage = `
+          <p>Для создания историй нужно разрешение от VK.</p>
+          <p>Попробуйте:</p>
+          <ol class="share-steps">
+            <li>Перезагрузить приложение</li>
+            <li>Проверить настройки VK</li>
+            <li>Или поделиться вручную через скриншот</li>
           </ol>
-          <p><strong>Сделайте скриншот и добавьте текст:</strong></p>
-          <div class="link-preview">${shareText}</div>
-          <p><strong>Или используйте этот фон:</strong></p>
-          <div style="background: url('${selectedBg.url}'); background-size: cover; width: 100%; height: 200px; border-radius: 10px; margin: 10px 0;"></div>
-        </div>
-        <button class="btn btn-share" onclick="shareResult()">🔄 Попробовать ещё раз</button>
-        <button class="btn btn-copy" onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n')}')">📋 Скопировать текст</button>
-        <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
-      `;
-    }
-
-    function showManualShareInstructions() {
-      const currentTitle = getTitle(document.querySelector('.result').textContent);
-      const shareUrl = `https://vk.com/app${APP_ID}`;
-      const shareText = `🔥 Я стал: ${currentTitle}!\n\nУзнай свою судьбу за 10 секунд 👇\n${shareUrl}`;
-      
-      const selectedBg = STORY_BACKGROUNDS[selectedBackgroundIndex];
-      
-      document.getElementById('game').innerHTML = `
-        <div class="result" id="resultBox">
-          ${document.querySelector('.result').innerHTML}
-        </div>
-        <div class="share-instruction">
-          <h3>📸 Как поделиться в историях</h3>
+        `;
+      } else {
+        dialogMessage = `
           <p>Автоматическое создание истории не сработало.</p>
-          <ol>
+          <p>Вы можете поделиться вручную:</p>
+          <ol class="share-steps">
             <li>Сделайте скриншот этого экрана</li>
-            <li>Откройте ВКонтакте и нажмите "Создать историю"</li>
+            <li>Откройте ВКонтакте</li>
+            <li>Нажмите "Создать историю"</li>
             <li>Добавьте скриншот и текст ниже:</li>
           </ol>
-          <div class="link-preview">${shareText}</div>
-          <p><strong>Или используйте этот фон:</strong></p>
-          <div style="background: url('${selectedBg.url}'); background-size: cover; width: 100%; height: 200px; border-radius: 10px; margin: 10px 0;"></div>
+        `;
+      }
+      
+      document.getElementById('game').innerHTML = `
+        <div class="result" id="resultBox">
+          ${document.querySelector('.result').innerHTML}
         </div>
-        <button class="btn btn-share" onclick="shareResult()">🔄 Попробовать ещё раз</button>
+        <div class="share-dialog">
+          <h3>${dialogTitle}</h3>
+          ${dialogMessage}
+          <div class="link-preview" style="background: #f5f5f5; color: #333; padding: 10px; border-radius: 8px; margin: 15px 0; font-size: 14px;">
+            ${shareText}
+          </div>
+        </div>
+        <button class="btn btn-try-again" onclick="createStory()">🔄 Попробовать снова</button>
         <button class="btn btn-copy" onclick="copyToClipboard('${shareText.replace(/\n/g, '\\n')}')">📋 Скопировать текст</button>
-        <button class="btn btn-free" onclick="showRandomStory()">🏠 Вернуться в игру</button>
+        <button class="btn btn-back" onclick="showRandomStory()">🏠 Вернуться в игру</button>
       `;
     }
 
     function copyToClipboard(text) {
       const unescapedText = text.replace(/\\n/g, '\n');
       navigator.clipboard.writeText(unescapedText)
-        .then(() => alert('✅ Текст скопирован! Теперь вы можете вставить его в историю.'))
+        .then(() => alert('✅ Текст скопирован!'))
         .catch(err => {
           console.error('Ошибка копирования:', err);
-          alert('❌ Не удалось скопировать текст. Попробуйте выделить и скопировать вручную.');
+          alert('❌ Не удалось скопировать текст');
         });
     }
 
