@@ -6,9 +6,9 @@
   <meta name="referrer" content="no-referrer">
   <title>Судьба за 10 секунд</title>
   
-  <!-- УПРОЩЕННЫЙ CSP -->
+  <!-- ИСПРАВЛЕННЫЙ CSP -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self' https://*.vk.com https://unpkg.com https://i.imgur.com;
+    default-src 'self' https://*.vk.com;
     script-src 'self' 'unsafe-inline' https://*.vk.com https://unpkg.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' https: data:;
@@ -17,6 +17,7 @@
   ">
   
   <style>
+    /* Стили остаются без изменений */
     * {
       margin: 0;
       padding: 0;
@@ -299,7 +300,7 @@
             "premium": false
           },
           "B": {
-            "outcome": "📡 ТЫ СТАЛ: ВСЕМИРНЫМ WI-FI\n\nПревратил НЛО в роутер. Весь район в онлайне.\nТы — герой двора.\n\n📶 Сигнал: 100/100",
+            "outcome": "📡 ТЫ СТАЛ: ВСЕМИРНЫЙ WI-FI\n\nПревратил НЛО в роутер. Весь район в онлайне.\nТы — герой двора.\n\n📶 Сигнал: 100/100",
             "premium": false
           }
         }
@@ -310,6 +311,7 @@
     let userId = 'demo123';
     const APP_ID = '54388761';
     let isSharing = false;
+    let vkBridgeLoaded = false;
 
     // ФУНКЦИИ
     function isInVK() {
@@ -388,6 +390,38 @@
       document.getElementById('modal-container').innerHTML = '';
     }
 
+    // УЛУЧШЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ VK BRIDGE
+    function loadVKBridge() {
+      return new Promise((resolve, reject) => {
+        if (window.vkBridge) {
+          vkBridgeLoaded = true;
+          resolve(window.vkBridge);
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js';
+        script.crossOrigin = 'anonymous';
+        
+        script.onload = () => {
+          if (window.vkBridge) {
+            vkBridgeLoaded = true;
+            updateStatus('✅ VK Bridge загружен');
+            resolve(window.vkBridge);
+          } else {
+            reject(new Error('VK Bridge не загрузился'));
+          }
+        };
+        
+        script.onerror = () => {
+          reject(new Error('Ошибка загрузки VK Bridge'));
+        };
+        
+        // Добавляем в head вместо body для лучшей совместимости
+        document.head.appendChild(script);
+      });
+    }
+
     // ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА
     async function shareResult() {
       if (isSharing) return;
@@ -397,11 +431,10 @@
       updateStatus('🔄 Начинаю создание истории...');
       
       try {
-        // Проверяем, есть ли VK Bridge
-        if (!window.vkBridge) {
-          updateStatus('❌ VK Bridge не загружен');
-          showManualShareInstructions();
-          return;
+        // Загружаем VK Bridge если еще не загружен
+        if (!vkBridgeLoaded) {
+          updateStatus('🔄 Загрузка VK Bridge...');
+          await loadVKBridge();
         }
         
         // Инициализируем приложение
@@ -429,7 +462,7 @@
         
       } catch (error) {
         console.error('Ошибка создания истории:', error);
-        updateStatus(`❌ Ошибка: ${error.error_message || 'Неизвестная ошибка'}`);
+        updateStatus(`❌ Ошибка: ${error.error_message || error.message || 'Неизвестная ошибка'}`);
         showManualShareInstructions();
       } finally {
         isSharing = false;
@@ -466,45 +499,30 @@
         updateStatus('✅ Обнаружен VK');
         
         try {
-          // Загружаем VK Bridge
-          const script = document.createElement('script');
-          script.src = 'https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js';
-          script.onload = async () => {
-            if (window.vkBridge) {
-              updateStatus('✅ VK Bridge загружен');
-              
-              // Инициализируем приложение
-              await window.vkBridge.send('VKWebAppInit', {});
-              updateStatus('✅ Приложение готово');
-              
-              // Получаем ID пользователя
-              try {
-                const userInfo = await window.vkBridge.send('VKWebAppGetUserInfo');
-                userId = userInfo.id;
-                updateStatus(`👤 Пользователь: ${userInfo.first_name}`);
-              } catch (e) {
-                console.log('Не удалось получить информацию о пользователе');
-              }
-              
-              // Показываем игру
-              showRandomStory();
-              updateStatus('');
-            } else {
-              updateStatus('❌ VK Bridge не загрузился');
-              showRandomStory();
+          // Пытаемся загрузить VK Bridge, но не блокируем запуск игры
+          loadVKBridge().then(async (bridge) => {
+            // Инициализируем приложение
+            await bridge.send('VKWebAppInit', {});
+            updateStatus('✅ Приложение готово');
+            
+            // Получаем ID пользователя
+            try {
+              const userInfo = await bridge.send('VKWebAppGetUserInfo');
+              userId = userInfo.id;
+              updateStatus(`👤 Пользователь: ${userInfo.first_name}`);
+            } catch (e) {
+              console.log('Не удалось получить информацию о пользователе');
             }
-          };
+          }).catch(error => {
+            console.log('VK Bridge загружен в фоновом режиме:', error.message);
+          });
           
-          script.onerror = () => {
-            updateStatus('❌ Ошибка загрузки VK Bridge');
-            showRandomStory();
-          };
-          
-          document.head.appendChild(script);
+          // Показываем игру немедленно, не дожидаясь VK Bridge
+          showRandomStory();
           
         } catch (error) {
           console.error('Ошибка инициализации:', error);
-          updateStatus('❌ Ошибка инициализации');
+          updateStatus('⚠️ Приложение работает в ограниченном режиме');
           showRandomStory();
         }
       } else {
