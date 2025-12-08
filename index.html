@@ -348,7 +348,7 @@
           ${outcome}
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
-        <button class="btn btn-share" onclick="shareResult()">📲 Поделиться в историях</button>
+        <button class="btn btn-share" onclick="tryShareResult()">📲 Поделиться в историях</button>
         <button class="btn btn-free" onclick="showRandomStory()">🔁 Сыграть ещё</button>
       `;
       
@@ -381,41 +381,29 @@
       document.getElementById('modal-container').innerHTML = '';
     }
 
-    // ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА
-    async function shareResult() {
+    // ПРОСТАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА (без attachment)
+    async function shareResultSimple() {
       if (isSharing) return;
       isSharing = true;
       
-      const currentTitle = getTitle(document.querySelector('.result').textContent);
       updateStatus('🔄 Начинаю создание истории...');
       
       try {
         // Проверяем, есть ли VK Bridge
         if (!window.vkBridge) {
           updateStatus('❌ VK Bridge не загружен');
-          showManualShareInstructions();
-          return;
+          return false;
         }
         
         // Инициализируем приложение
         await window.vkBridge.send('VKWebAppInit', {});
         updateStatus('✅ Приложение инициализировано');
         
-        // Получаем ID пользователя
-        let userInfo;
-        try {
-          userInfo = await window.vkBridge.send('VKWebAppGetUserInfo');
-          userId = userInfo.id;
-        } catch (e) {
-          console.log('Не удалось получить информацию о пользователе');
-        }
-        
-        // ИСПРАВЛЕНО: Создаем историю БЕЗ attachment с текстом
-        // Вместо этого используем только изображение
+        // ИСПРАВЛЕНО: Создаем историю БЕЗ attachment
+        // Просто картинка без дополнительных параметров
         const storyParams = {
           background_type: 'image',
-          url: 'https://i.imgur.com/OQ6nZwQ.jpg', // Красивая картинка для истории
-          locked: false
+          url: 'https://i.imgur.com/OQ6nZwQ.jpg' // Просто URL картинки
         };
         
         updateStatus('🔄 Создаю историю...');
@@ -424,34 +412,100 @@
         if (result) {
           updateStatus('✅ История создана!');
           console.log('История создана:', result);
-          
-          // Показываем сообщение об успехе
-          setTimeout(() => {
-            alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.\n\nСовет: вы можете добавить текст к истории в редакторе VK!');
-            showRandomStory();
-            updateStatus('');
-          }, 1000);
+          return true;
         }
+        
+        return false;
         
       } catch (error) {
         console.error('Ошибка создания истории:', error);
-        
-        let errorMessage = 'Неизвестная ошибка';
-        if (error.error_message) {
-          errorMessage = error.error_message;
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else if (error.error_data && error.error_data.error_reason) {
-          errorMessage = error.error_data.error_reason;
-        }
-        
-        updateStatus(`❌ Ошибка: ${errorMessage}`);
-        
-        // Показываем инструкцию для ручного шеринга
-        showManualShareInstructions();
-        
+        updateStatus(`❌ Ошибка: ${error.error_message || error.message || 'Неизвестная ошибка'}`);
+        return false;
       } finally {
         isSharing = false;
+      }
+    }
+
+    // ПОПЫТКА С ПРАВИЛЬНЫМ ATTACHMENT
+    async function shareResultWithAttachment() {
+      try {
+        if (!window.vkBridge) return false;
+        
+        await window.vkBridge.send('VKWebAppInit', {});
+        
+        // Используем правильный тип кнопки "play" для игр
+        const storyParams = {
+          background_type: 'image',
+          url: 'https://i.imgur.com/OQ6nZwQ.jpg',
+          attachment: {
+            text: 'play', // Правильный тип для игр
+            url: `https://vk.com/app${APP_ID}`
+          }
+        };
+        
+        const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
+        return !!result;
+      } catch (error) {
+        console.log('Метод с attachment не сработал:', error);
+        return false;
+      }
+    }
+
+    // ПОПЫТКА С ДРУГИМ ТИПОМ ATTACHMENT
+    async function shareResultAlternative() {
+      try {
+        if (!window.vkBridge) return false;
+        
+        await window.vkBridge.send('VKWebAppInit', {});
+        
+        // Пробуем другой формат без текста
+        const storyParams = {
+          background_type: 'image',
+          url: 'https://i.imgur.com/OQ6nZwQ.jpg',
+          attachment: {
+            type: 'url',
+            url: `https://vk.com/app${APP_ID}`
+          }
+        };
+        
+        const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
+        return !!result;
+      } catch (error) {
+        console.log('Альтернативный метод не сработал:', error);
+        return false;
+      }
+    }
+
+    // ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ШЕРИНГА (пробуем все варианты)
+    async function tryShareResult() {
+      const currentTitle = getTitle(document.querySelector('.result').textContent);
+      updateStatus('🔄 Пробую создать историю...');
+      
+      // Пробуем простой метод (без attachment)
+      let success = await shareResultSimple();
+      
+      // Если не получилось, пробуем с attachment
+      if (!success) {
+        updateStatus('🔄 Пробую другой метод...');
+        success = await shareResultWithAttachment();
+      }
+      
+      // Если все еще не получилось, пробуем альтернативный
+      if (!success) {
+        updateStatus('🔄 Пробую третий метод...');
+        success = await shareResultAlternative();
+      }
+      
+      if (success) {
+        updateStatus('✅ История создана!');
+        setTimeout(() => {
+          alert('🎉 История успешно создана! Проверьте свои истории ВКонтакте.');
+          showRandomStory();
+          updateStatus('');
+        }, 1000);
+      } else {
+        updateStatus('❌ Не удалось создать историю');
+        showManualShareInstructions();
       }
     }
 
@@ -487,36 +541,6 @@
           console.error('Ошибка копирования:', err);
           alert('❌ Не удалось скопировать текст. Попробуйте выделить и скопировать вручную.');
         });
-    }
-
-    // ВАРИАНТ 2: Попробовать с правильным типом attachment (play или game)
-    async function shareResultAlternative() {
-      try {
-        if (!window.vkBridge) return;
-        
-        await window.vkBridge.send('VKWebAppInit', {});
-        
-        const currentTitle = getTitle(document.querySelector('.result').textContent);
-        const appLink = `https://vk.com/app${APP_ID}`;
-        
-        // Пробуем использовать тип "play" или "game" для мини-приложения
-        const storyParams = {
-          background_type: 'image',
-          url: 'https://i.imgur.com/OQ6nZwQ.jpg',
-          attachment: {
-            text: 'play', // Или 'game'
-            type: 'url',
-            url: appLink
-          },
-          locked: false
-        };
-        
-        const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyParams);
-        return result;
-      } catch (error) {
-        console.log('Альтернативный метод тоже не сработал:', error);
-        return null;
-      }
     }
 
     // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
