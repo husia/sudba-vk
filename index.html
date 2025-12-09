@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="referrer" content="no-referrer">
   <title>Судьба за 10 секунд</title>
   
@@ -10,10 +10,17 @@
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
   
   <style>
+    /* БАЗОВЫЕ СТИЛИ */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html {
+      height: 100%;
+      overflow-x: hidden;
     }
     
     body {
@@ -21,27 +28,43 @@
         radial-gradient(circle at 20% 30%, #000428 0%, #004e92 100%),
         url('https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80');
       background-blend-mode: multiply;
+      background-attachment: fixed;
       min-height: 100vh;
-      padding: 20px;
+      padding: 15px;
       color: white;
       text-align: center;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
       overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     
+    /* КОНТЕЙНЕР */
     .container {
-      max-width: 600px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 500px;
       background: rgba(10, 10, 30, 0.85);
-      backdrop-filter: blur(15px);
-      border-radius: 30px;
-      padding: 40px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 25px;
+      padding: 25px 20px;
       box-shadow: 
-        0 0 60px rgba(0, 191, 255, 0.4),
-        0 20px 50px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(0, 191, 255, 0.3);
+        0 0 40px rgba(0, 191, 255, 0.3),
+        0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0, 191, 255, 0.2);
       position: relative;
       overflow: hidden;
+      margin: auto;
+    }
+    
+    @media (min-width: 768px) {
+      .container {
+        padding: 35px 30px;
+        border-radius: 30px;
+      }
     }
     
     .container::before {
@@ -54,12 +77,12 @@
       background: conic-gradient(
         from 0deg,
         transparent,
-        rgba(0, 191, 255, 0.1),
-        rgba(0, 150, 255, 0.2),
-        rgba(0, 191, 255, 0.1),
+        rgba(0, 191, 255, 0.08),
+        rgba(0, 150, 255, 0.15),
+        rgba(0, 191, 255, 0.08),
         transparent
       );
-      animation: rotate 30s linear infinite;
+      animation: rotate 40s linear infinite;
       z-index: -1;
     }
     
@@ -67,72 +90,115 @@
       100% { transform: rotate(360deg); }
     }
     
+    /* ЗАГОЛОВОК */
     h1 {
-      font-size: 36px;
-      margin-bottom: 30px;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: #00FFFF;
       text-shadow: 
-        0 0 20px #00FFFF,
-        0 0 40px #0080FF,
-        0 2px 10px rgba(0,0,0,0.8);
+        0 0 15px #00FFFF,
+        0 0 30px #0080FF,
+        0 2px 5px rgba(0,0,0,0.8);
       position: relative;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
+      line-height: 1.3;
+    }
+    
+    @media (min-width: 768px) {
+      h1 {
+        font-size: 2.2rem;
+        letter-spacing: 3px;
+        padding-bottom: 20px;
+      }
+      
+      h1::before {
+        content: '🔥';
+        margin-right: 10px;
+      }
     }
     
     h1::after {
-      content: '✦✦✦';
+      content: '';
       position: absolute;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      color: #00FFFF;
-      font-size: 20px;
-      letter-spacing: 10px;
-      opacity: 0.7;
+      width: 120px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00FFFF, transparent);
+      border-radius: 2px;
     }
     
+    /* ИСТОРИЯ - улучшенный стиль */
     .story-box {
       background: rgba(0, 30, 60, 0.4);
       border-radius: 20px;
-      padding: 25px;
-      margin: 25px 0;
-      font-size: 20px;
+      padding: 20px;
+      margin: 20px 0;
+      font-size: 1.1rem;
       line-height: 1.6;
       white-space: pre-wrap;
       border: 1px solid rgba(0, 191, 255, 0.3);
       color: #E0F7FF;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
       box-shadow: 
         inset 0 0 20px rgba(0, 191, 255, 0.1),
         0 5px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
     }
     
-    /* ЭПИЧНЫЕ КНОПКИ В СТИЛЕ ЭОН */
+    @media (min-width: 768px) {
+      .story-box {
+        padding: 25px;
+        font-size: 1.2rem;
+        margin: 25px 0;
+      }
+    }
+    
+    .story-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(0, 191, 255, 0.05) 50%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+    
+    /* ЭПИЧНЫЕ КНОПКИ В СТИЛЕ ЭОН - адаптивные */
     .destiny-btn {
-      display: block;
+      display: flex;
+      align-items: center;
       width: 100%;
-      padding: 25px;
-      margin: 20px 0;
+      padding: 18px 20px;
+      margin: 15px 0;
       border: none;
-      border-radius: 25px;
-      font-size: 26px;
-      font-weight: 900;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      font-weight: 800;
       cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       text-transform: uppercase;
-      letter-spacing: 3px;
+      letter-spacing: 1.5px;
       position: relative;
       overflow: hidden;
       z-index: 1;
       text-shadow: 
-        0 2px 10px rgba(0,0,0,0.8),
-        0 0 20px #00FFFF;
+        0 1px 3px rgba(0,0,0,0.8),
+        0 0 10px rgba(0, 255, 255, 0.5);
       box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.5),
-        0 0 15px rgba(0, 191, 255, 0.3),
+        0 8px 20px rgba(0, 0, 0, 0.4),
+        0 0 10px rgba(0, 191, 255, 0.2),
         inset 0 1px 0 rgba(255,255,255,0.1);
       background: linear-gradient(
         135deg,
@@ -142,39 +208,87 @@
       );
       color: #00FFFF;
       border: 2px solid #00FFFF;
+      min-height: 70px;
     }
     
-    .destiny-btn:hover {
-      transform: translateY(-8px) scale(1.03);
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.7),
-        0 0 30px #00FFFF,
-        0 0 40px rgba(0, 191, 255, 0.5),
-        inset 0 1px 0 rgba(255,255,255,0.2);
-      letter-spacing: 5px;
-      animation: eon-glow 0.5s infinite alternate;
+    @media (min-width: 768px) {
+      .destiny-btn {
+        padding: 22px 25px;
+        font-size: 1.3rem;
+        letter-spacing: 2px;
+        margin: 18px 0;
+      }
+      
+      .destiny-btn:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 
+          0 15px 30px rgba(0, 0, 0, 0.6),
+          0 0 25px #00FFFF,
+          0 0 35px rgba(0, 191, 255, 0.4),
+          inset 0 1px 0 rgba(255,255,255,0.2);
+        letter-spacing: 3px;
+        animation: eon-glow 0.5s infinite alternate;
+      }
+    }
+    
+    .destiny-btn:active {
+      transform: translateY(-2px) scale(0.98);
+      transition: 0.1s;
     }
     
     @keyframes eon-glow {
       from { 
         box-shadow: 
-          0 20px 40px rgba(0, 0, 0, 0.7),
-          0 0 30px #00FFFF,
-          0 0 40px rgba(0, 191, 255, 0.5),
-          inset 0 1px 0 rgba(255,255,255,0.2);
+          0 15px 30px rgba(0, 0, 0, 0.6),
+          0 0 25px #00FFFF,
+          0 0 35px rgba(0, 191, 255, 0.4);
       }
       to { 
         box-shadow: 
-          0 20px 40px rgba(0, 0, 0, 0.7),
-          0 0 40px #00FFFF,
-          0 0 50px rgba(0, 191, 255, 0.7),
-          inset 0 1px 0 rgba(255,255,255,0.3);
+          0 15px 30px rgba(0, 0, 0, 0.6),
+          0 0 30px #00FFFF,
+          0 0 40px rgba(0, 191, 255, 0.6);
       }
     }
     
-    .destiny-btn:active {
-      transform: translateY(-4px) scale(0.98);
-      transition: 0.1s;
+    /* Иконки всегда слева */
+    .destiny-btn .btn-icon {
+      font-size: 1.5rem;
+      margin-right: 15px;
+      min-width: 30px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    
+    .destiny-btn .btn-text {
+      flex-grow: 1;
+      text-align: left;
+      font-size: 1.1rem;
+      font-weight: 700;
+      position: relative;
+      padding: 5px 0;
+    }
+    
+    @media (min-width: 768px) {
+      .destiny-btn .btn-text {
+        font-size: 1.2rem;
+      }
+    }
+    
+    .destiny-btn .btn-text::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #00FFFF, transparent);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+    
+    .destiny-btn:hover .btn-text::after {
+      transform: scaleX(1);
     }
     
     /* Анимация свечения при наведении */
@@ -188,17 +302,18 @@
       background: linear-gradient(
         90deg,
         transparent,
-        rgba(0, 255, 255, 0.2),
+        rgba(0, 255, 255, 0.15),
         transparent
       );
       transition: 0.5s;
       z-index: -1;
     }
     
-    .destiny-btn:hover::before {
+    .destiny-btn:active::before {
       left: 100%;
     }
     
+    /* Кнопка шеринга */
     .btn-share {
       background: linear-gradient(
         135deg,
@@ -209,33 +324,15 @@
       color: #FF1493;
       border: 2px solid #FF1493;
       text-shadow: 
-        0 2px 10px rgba(0,0,0,0.8),
-        0 0 20px #FF1493;
+        0 1px 3px rgba(0,0,0,0.8),
+        0 0 15px rgba(255, 20, 147, 0.5);
       box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.5),
-        0 0 15px rgba(255, 20, 147, 0.3),
+        0 8px 20px rgba(0, 0, 0, 0.4),
+        0 0 10px rgba(255, 20, 147, 0.2),
         inset 0 1px 0 rgba(255,255,255,0.1);
     }
     
-    .btn-share:hover {
-      animation: share-glow 0.5s infinite alternate;
-    }
-    
-    @keyframes share-glow {
-      from { 
-        box-shadow: 
-          0 20px 40px rgba(0, 0, 0, 0.7),
-          0 0 30px #FF1493,
-          0 0 40px rgba(255, 20, 147, 0.5);
-      }
-      to { 
-        box-shadow: 
-          0 20px 40px rgba(0, 0, 0, 0.7),
-          0 0 40px #FF1493,
-          0 0 50px rgba(255, 20, 147, 0.7);
-      }
-    }
-    
+    /* Кнопка повторной игры */
     .btn-play-again {
       background: linear-gradient(
         135deg,
@@ -246,34 +343,43 @@
       color: #7CFC00;
       border: 2px solid #7CFC00;
       text-shadow: 
-        0 2px 10px rgba(0,0,0,0.8),
-        0 0 20px #7CFC00;
+        0 1px 3px rgba(0,0,0,0.8),
+        0 0 15px rgba(124, 252, 0, 0.5);
       box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.5),
-        0 0 15px rgba(124, 252, 0, 0.3),
+        0 8px 20px rgba(0, 0, 0, 0.4),
+        0 0 10px rgba(124, 252, 0, 0.2),
         inset 0 1px 0 rgba(255,255,255,0.1);
     }
     
+    /* РЕЗУЛЬТАТ - улучшенный формат */
     .result {
-      background: rgba(0, 30, 60, 0.6);
-      border-radius: 25px;
-      padding: 30px;
-      margin: 30px 0;
-      font-size: 20px;
+      background: rgba(0, 30, 60, 0.5);
+      border-radius: 20px;
+      padding: 25px 20px;
+      margin: 25px 0;
+      font-size: 1.1rem;
       line-height: 1.7;
       border: 2px solid #FFD700;
       color: #FFFACD;
-      animation: fadeIn 0.8s ease-out;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      animation: fadeIn 0.6s ease-out;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
       box-shadow: 
-        inset 0 0 30px rgba(255, 215, 0, 0.1),
-        0 10px 25px rgba(0, 0, 0, 0.4);
+        inset 0 0 25px rgba(255, 215, 0, 0.1),
+        0 8px 20px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    
+    @media (min-width: 768px) {
+      .result {
+        padding: 30px 25px;
+        font-size: 1.2rem;
+      }
     }
     
     @keyframes fadeIn {
       from { 
         opacity: 0; 
-        transform: translateY(20px) scale(0.95); 
+        transform: translateY(15px) scale(0.98); 
       }
       to { 
         opacity: 1; 
@@ -281,74 +387,63 @@
       }
     }
     
+    /* Особое форматирование для "ТЫ СТАЛ:" */
+    .result-title {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #FFD700;
+      text-shadow: 
+        0 0 15px rgba(255, 215, 0, 0.7),
+        0 2px 5px rgba(0,0,0,0.8);
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    
+    .result-role {
+      display: block;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #00FFFF;
+      text-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.7),
+        0 2px 5px rgba(0,0,0,0.8);
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+    
+    .result-description {
+      display: block;
+      font-size: 1.1rem;
+      color: #E0F7FF;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .result-stats {
+      display: block;
+      font-size: 1rem;
+      color: #FFD700;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+    }
+    
     .rarity {
       display: inline-block;
-      margin-top: 15px;
+      margin-top: 20px;
       padding: 8px 20px;
       border-radius: 25px;
-      font-size: 16px;
+      font-size: 0.9rem;
       font-weight: bold;
       background: rgba(0, 191, 255, 0.2);
       color: #00FFFF;
       border: 1px solid rgba(0, 191, 255, 0.4);
-      text-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
-    }
-    
-    .confetti {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 100;
-      opacity: 0;
-    }
-    
-    .footer {
-      margin-top: 30px;
-      font-size: 14px;
-      opacity: 0.8;
-      color: #87CEEB;
-      letter-spacing: 1px;
-    }
-    
-    .loading {
-      font-size: 24px;
-      margin: 40px 0;
-      color: #00FFFF;
-      text-shadow: 0 0 15px #00FFFF;
-      animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { 
-        opacity: 0.7;
-        transform: scale(1);
-      }
-      50% { 
-        opacity: 1;
-        transform: scale(1.05);
-      }
-    }
-    
-    .status {
-      margin-top: 20px;
-      padding: 15px;
-      background: rgba(0, 40, 80, 0.4);
-      border-radius: 15px;
-      font-size: 14px;
-      color: #87CEEB;
-      border: 1px solid rgba(0, 191, 255, 0.2);
-    }
-    
-    .error {
-      background: rgba(255, 0, 0, 0.1);
-      border: 1px solid rgba(255, 0, 0, 0.3);
-      padding: 20px;
-      border-radius: 15px;
-      margin: 20px 0;
-      color: #FF6B6B;
+      text-shadow: 0 0 8px rgba(0, 191, 255, 0.5);
     }
     
     /* АНИМАЦИЯ ВЫБОРА */
@@ -358,14 +453,15 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.95);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.5s;
+      transition: all 0.4s;
+      padding: 20px;
     }
     
     .choice-overlay.active {
@@ -381,15 +477,15 @@
         rgba(0, 255, 255, 0.1) 100%
       );
       border: 2px solid #00FFFF;
-      border-radius: 25px;
-      padding: 50px;
-      max-width: 500px;
-      width: 90%;
+      border-radius: 20px;
+      padding: 30px 25px;
+      width: 100%;
+      max-width: 400px;
       text-align: center;
       box-shadow: 
-        0 0 50px rgba(0, 191, 255, 0.5),
-        inset 0 0 30px rgba(0, 191, 255, 0.1);
-      transform: scale(0.8);
+        0 0 40px rgba(0, 191, 255, 0.4),
+        inset 0 0 20px rgba(0, 191, 255, 0.1);
+      transform: scale(0.9);
       opacity: 0;
       animation: messageAppear 0.5s ease-out forwards;
     }
@@ -403,34 +499,36 @@
     
     .choice-message h2 {
       color: #00FFFF;
-      font-size: 32px;
-      margin-bottom: 20px;
+      font-size: 1.8rem;
+      margin-bottom: 15px;
       text-shadow: 
-        0 0 20px #00FFFF,
-        0 0 40px #0080FF;
-      letter-spacing: 2px;
+        0 0 15px #00FFFF,
+        0 0 30px #0080FF;
+      letter-spacing: 1px;
+      line-height: 1.3;
     }
     
     .choice-message p {
       color: #E0F7FF;
-      font-size: 20px;
+      font-size: 1.1rem;
       line-height: 1.5;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
     }
     
     .loading-dots {
       display: inline-flex;
-      margin-top: 30px;
+      margin-top: 20px;
     }
     
     .loading-dots span {
-      width: 15px;
-      height: 15px;
-      margin: 0 5px;
+      width: 12px;
+      height: 12px;
+      margin: 0 6px;
       background: #00FFFF;
       border-radius: 50%;
       animation: dots 1.5s infinite ease-in-out;
-      box-shadow: 0 0 10px #00FFFF;
+      box-shadow: 0 0 8px #00FFFF;
     }
     
     .loading-dots span:nth-child(2) {
@@ -452,7 +550,71 @@
       }
     }
     
-    /* Космическая пыль */
+    /* СТАТУС И ФУТЕР */
+    .status {
+      margin-top: 20px;
+      padding: 12px 15px;
+      background: rgba(0, 40, 80, 0.3);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #87CEEB;
+      border: 1px solid rgba(0, 191, 255, 0.2);
+      word-break: break-word;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    
+    .footer {
+      margin-top: 25px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      color: #87CEEB;
+      letter-spacing: 0.5px;
+      text-align: center;
+      padding: 0 10px;
+      line-height: 1.4;
+      max-width: 100%;
+    }
+    
+    @media (min-width: 768px) {
+      .footer {
+        font-size: 1rem;
+        letter-spacing: 1px;
+      }
+    }
+    
+    /* ЗАГРУЗКА */
+    .loading {
+      font-size: 1.3rem;
+      margin: 40px 0;
+      color: #00FFFF;
+      text-shadow: 0 0 10px #00FFFF;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { 
+        opacity: 0.7;
+        transform: scale(1);
+      }
+      50% { 
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+    
+    /* ОШИБКИ */
+    .error {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+      color: #FF6B6B;
+      font-size: 1rem;
+    }
+    
+    /* КОСМИЧЕСКАЯ ПЫЛЬ */
     .cosmic-dust {
       position: fixed;
       top: 0;
@@ -471,32 +633,98 @@
     }
     
     @keyframes twinkle {
-      0% { opacity: 0.1; transform: scale(0.5); }
-      100% { opacity: 0.8; transform: scale(1); }
+      0% { opacity: 0.1; transform: scale(0.3); }
+      100% { opacity: 0.6; transform: scale(0.8); }
     }
     
-    .destiny-text {
-      font-size: 24px;
-      font-weight: 800;
-      position: relative;
-      display: inline-block;
-      padding: 5px 0;
+    /* Улучшенный скролл для мобилок */
+    @media (max-width: 767px) {
+      body {
+        padding: 10px;
+        font-size: 15px;
+      }
+      
+      .container {
+        padding: 20px 15px;
+        border-radius: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+      }
+      
+      .story-box {
+        font-size: 1rem;
+        padding: 18px;
+        margin: 18px 0;
+      }
+      
+      .destiny-btn {
+        padding: 16px;
+        font-size: 1.1rem;
+        min-height: 65px;
+      }
+      
+      .destiny-btn .btn-icon {
+        font-size: 1.3rem;
+        margin-right: 12px;
+      }
+      
+      .destiny-btn .btn-text {
+        font-size: 1rem;
+      }
+      
+      .result {
+        padding: 20px 15px;
+        font-size: 1rem;
+      }
+      
+      .result-title {
+        font-size: 1.2rem;
+      }
+      
+      .result-role {
+        font-size: 1.3rem;
+      }
+      
+      .result-description {
+        font-size: 1rem;
+      }
+      
+      .choice-message {
+        padding: 25px 20px;
+      }
+      
+      .choice-message h2 {
+        font-size: 1.5rem;
+      }
+      
+      .choice-message p {
+        font-size: 1rem;
+      }
     }
     
-    .destiny-text::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, currentColor, transparent);
-      transform: scaleX(0);
-      transition: transform 0.3s;
-    }
-    
-    .destiny-btn:hover .destiny-text::after {
-      transform: scaleX(1);
+    /* Очень маленькие экраны */
+    @media (max-width: 360px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+      
+      .destiny-btn {
+        padding: 14px;
+        min-height: 60px;
+      }
+      
+      .destiny-btn .btn-text {
+        font-size: 0.95rem;
+      }
+      
+      .story-box,
+      .result {
+        font-size: 0.95rem;
+      }
     }
   </style>
 </head>
@@ -518,16 +746,13 @@
   </div>
   
   <div class="container">
-    <h1>🔥 СУДЬБА ЗА 10 СЕКУНД</h1>
+    <h1>СУДЬБА ЗА 10 СЕКУНД</h1>
     <div id="game">
       <div class="loading">✨ Загрузка Судьбы...</div>
     </div>
     <div id="status" class="status"></div>
     <div class="footer">Выбери Путь Судьбы ✦ Каждый выбор изменит реальность</div>
   </div>
-
-  <div class="confetti" id="confetti"></div>
-  <div id="modal-container"></div>
 
   <script>
     // ИСТОРИИ
@@ -583,22 +808,21 @@
       const statusEl = document.getElementById('status');
       if (statusEl) {
         statusEl.innerHTML = text;
-        console.log('Status:', text);
       }
     }
 
     // Создаем звездную пыль
     function createCosmicDust() {
       const dust = document.getElementById('cosmicDust');
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 25; i++) {
         const star = document.createElement('div');
         star.className = 'star';
         star.style.left = `${Math.random() * 100}%`;
         star.style.top = `${Math.random() * 100}%`;
-        star.style.width = `${Math.random() * 2 + 1}px`;
+        star.style.width = `${Math.random() * 1.5 + 0.5}px`;
         star.style.height = star.style.width;
-        star.style.opacity = Math.random() * 0.3 + 0.1;
-        star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+        star.style.opacity = Math.random() * 0.2 + 0.1;
+        star.style.setProperty('--duration', `${Math.random() * 2 + 1}s`);
         dust.appendChild(star);
       }
     }
@@ -611,9 +835,12 @@
       const overlay = document.getElementById('choiceOverlay');
       overlay.classList.add('active');
       
-      // Через 2 секунды показываем результат
+      // Отключаем прокрутку на время анимации
+      document.body.style.overflow = 'hidden';
+      
       setTimeout(() => {
         overlay.classList.remove('active');
+        document.body.style.overflow = '';
         showResult(storyId, choice);
       }, 2000);
     }
@@ -630,13 +857,17 @@
       let html = `<div class="story-box">${story.text}</div>`;
       
       // Создаем кнопки с судьбоносными названиями
-      for (const key in story.options) {
-        html += `
-          <button class="destiny-btn" onclick="showChoiceAnimation('${storyId}', '${key}')">
-            <span class="destiny-text">${key}</span>
-          </button>
-        `;
-      }
+      html += `
+        <button class="destiny-btn" onclick="showChoiceAnimation('${storyId}', 'СУДЬБА I')">
+          <span class="btn-icon">🌀</span>
+          <span class="btn-text">СУДЬБА I</span>
+        </button>
+        
+        <button class="destiny-btn" onclick="showChoiceAnimation('${storyId}', 'СУДЬБА II')">
+          <span class="btn-icon">✨</span>
+          <span class="btn-text">СУДЬБА II</span>
+        </button>
+      `;
       
       document.getElementById('game').innerHTML = html;
     }
@@ -645,16 +876,41 @@
       const outcome = STORIES[storyId].options[choice].outcome;
       currentResult = outcome;
       
+      // Парсим результат для красивого отображения
+      const lines = outcome.split('\n');
+      let role = "Тайная личность";
+      let description = "";
+      let stats = "";
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line.includes("ТЫ СТАЛ: ")) {
+          role = line.split("ТЫ СТАЛ: ")[1].replace(/[💎🏆🌀✨]/g, '').trim();
+        } else if (line && !line.includes("ТЫ СТАЛ:") && !line.includes("Уровень")) {
+          if (description) description += "<br>";
+          description += line;
+        } else if (line.includes("Уровень")) {
+          stats = line;
+        }
+      }
+      
       const resultHtml = `
-        <div class="result" id="resultBox">
-          ${outcome}
+        <div class="result">
+          <span class="result-title">ТЫ СТАЛ:</span>
+          <span class="result-role">${role}</span>
+          <div class="result-description">${description}</div>
+          ${stats ? `<div class="result-stats">${stats}</div>` : ''}
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
+        
         <button class="destiny-btn btn-share" onclick="shareToVKStory()">
-          <span class="destiny-text">📲 Поделиться в историях</span>
+          <span class="btn-icon">📲</span>
+          <span class="btn-text">Поделиться в историях</span>
         </button>
+        
         <button class="destiny-btn btn-play-again" onclick="showRandomStory()">
-          <span class="destiny-text">🌀 Испытать судьбу снова</span>
+          <span class="btn-icon">🌀</span>
+          <span class="btn-text">Испытать судьбу снова</span>
         </button>
       `;
       
@@ -744,8 +1000,6 @@
         
         const result = await window.vkBridge.send('VKWebAppShowStoryBox', storyData);
         
-        console.log('Story result:', result);
-        
         if (result && result.result) {
           updateStatus('✅ История создана!');
           setTimeout(() => {
@@ -768,7 +1022,6 @@
         }
         
         updateStatus(`❌ ${errorMessage}`);
-        showErrorDetails(error);
         
       } finally {
         isSharing = false;
@@ -783,51 +1036,6 @@
         img.onerror = () => reject(new Error(`Фон не доступен`));
         img.src = url;
       });
-    }
-
-    function showErrorDetails(error) {
-      const outcome = currentResult;
-      const title = getTitle(outcome);
-      const shareText = `🔥 Я стал: ${title}!\n\n${outcome}\n\nУзнай свою судьбу за 10 секунд 👇\nhttps://vk.com/app${APP_ID}`;
-      
-      document.getElementById('game').innerHTML = `
-        <div class="result" id="resultBox">
-          ${outcome}
-          <div class="rarity">💎 Редкость: Легендарная</div>
-        </div>
-        
-        <div class="error">
-          <h3>⚠️ Автоматическое создание не сработало</h3>
-          <p><strong>Ошибка:</strong> ${error.error_data?.error_reason || error.message}</p>
-          <p><small>Попробуйте поделиться вручную:</small></p>
-        </div>
-        
-        <div style="background: rgba(0,30,60,0.4); padding: 20px; border-radius: 16px; margin: 20px 0; border: 1px solid rgba(0,191,255,0.3);">
-          <h3 style="color: #00FFFF; margin-bottom: 15px;">📱 Как поделиться вручную</h3>
-          
-          <p><strong>1. Откройте ВКонтакте на телефоне</strong></p>
-          <p><strong>2. Нажмите "Создать историю"</strong></p>
-          <p><strong>3. Выберите фон:</strong></p>
-          <img src="${BACKGROUND_IMAGE_URL}" style="width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid rgba(0,191,255,0.5);">
-          
-          <p><strong>4. Добавьте текст:</strong></p>
-          <div style="background: rgba(0,191,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-size: 14px; text-align: left; color: #E0F7FF;">
-            ${shareText}
-          </div>
-          
-          <p><strong>5. Добавьте ссылку:</strong></p>
-          <div style="background: rgba(0,191,255,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; color: #87CEEB;">
-            https://vk.com/app${APP_ID}
-          </div>
-        </div>
-        
-        <button class="destiny-btn btn-share" onclick="shareToVKStory()">
-          <span class="destiny-text">🔄 Попробовать снова</span>
-        </button>
-        <button class="destiny-btn btn-play-again" onclick="showRandomStory()">
-          <span class="destiny-text">🏠 Вернуться к выбору</span>
-        </button>
-      `;
     }
 
     // ИНИЦИАЛИЗАЦИЯ
@@ -867,7 +1075,27 @@
       }
     }
 
+    // Запуск при загрузке
     document.addEventListener('DOMContentLoaded', initApp);
+    
+    // Адаптация размера шрифта для очень маленьких экранов
+    function adjustForScreen() {
+      const screenWidth = window.innerWidth;
+      const html = document.documentElement;
+      
+      if (screenWidth < 360) {
+        html.style.fontSize = '14px';
+      } else if (screenWidth < 768) {
+        html.style.fontSize = '15px';
+      } else {
+        html.style.fontSize = '16px';
+      }
+    }
+    
+    // Запускаем при загрузке и ресайзе
+    window.addEventListener('load', adjustForScreen);
+    window.addEventListener('resize', adjustForScreen);
+    adjustForScreen();
   </script>
 </body>
 </html>
