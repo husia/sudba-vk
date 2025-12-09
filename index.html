@@ -793,7 +793,7 @@
 
     // КОНСТАНТЫ
     const APP_ID = '54388761';
-    const BACKGROUND_IMAGE_URL = "https://sun9-71.userapi.com/s/v1/ig2/wSfL7ZpafMbroZRCGZaqH1wP3oOKe6C7j7bIPT2CJcFSVGUu2SLEBIzUxDWsV4W9qeI_5HrahzutS2YriUEGq3lf.jpg?quality=95&as=32x57,48x85,72x128,108x192,160x284,240x427,360x640,480x853,540x960,640x1138,720x1280,1080x1920&from=bu&cs=1080x0";
+    const BACKGROUND_IMAGE_URL = "https://sun9-28.userapi.com/s/v1/ig2/vtjgV0JwGnv0eHG4XfKlriNszpJHfOUG8tlmEYEHoN9kU_ghMYjjIbkyMXnFogJuYgzE0VuhtPpkJgHg8vcT-qjq.jpg?quality=95&as=32x57,48x85,72x128,108x192,160x284,240x427,360x640,480x853,540x960,640x1138,720x1280,1080x1920&from=bu&cs=1080x0";
 
     // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     let userId = 'demo123';
@@ -956,14 +956,14 @@
           }
         }
         
-        // Проверяем доступность фона
+        // Проверяем доступность нового фона
         updateStatus('🌀 Проверяю фон...');
         await testImage(BACKGROUND_IMAGE_URL);
         
         // Создаем стикеры с правильным расположением
         const stickers = [];
         
-        // 1. Заголовок "ТЫ СТАЛ:"
+        // 1. Заголовок "ТЫ СТАЛ:" - ближе к верху
         stickers.push({
           "sticker_type": "native",
           "sticker": { 
@@ -977,13 +977,13 @@
             },
             "transform": {
               "gravity": "center_top",
-              "translation_y": 0.15,
-              "scale": 0.9
+              "translation_y": 0.08, // Ближе к верху
+              "scale": 1.0 // Нормальный размер
             }
           }
         });
         
-        // 2. Название роли
+        // 2. Название роли - сразу под заголовком
         stickers.push({
           "sticker_type": "native",
           "sticker": { 
@@ -997,100 +997,73 @@
             },
             "transform": {
               "gravity": "center_top",
-              "translation_y": 0.25,
-              "scale": 0.85
+              "translation_y": 0.18, // Ближе к заголовку
+              "scale": 0.9
             }
           }
         });
         
-        // 3. Описание (шрифт уменьшен ВДВОЕ)
-        const descLines = description.split('\n').slice(0, 2);
-        descLines.forEach((line, index) => {
-          if (line.trim()) {
-            stickers.push({
-              "sticker_type": "native",
-              "sticker": { 
-                "action_type": "text", 
-                "action": {
-                  "text": line, 
-                  "style": "classic",
-                  "background_style": "none",
-                  "selection_color": "#E0F7FF",
-                  "text_color": "#E0F7FF"
-                },
-                "transform": {
-                  "gravity": "center_top",
-                  "translation_y": 0.35 + (index * 0.07),
-                  "scale": 0.45 // УМЕНЬШЕНО ВДВОЕ (было 0.9)
-                }
-              }
-            });
-          }
-        });
+        // 3. Весь outcome в одном сообщении по середине
+        // Собираем полное описание
+        let fullOutcome = "";
+        const outcomeLines = outcome.split('\n');
         
-        // 4. Статистика (шрифт уменьшен ВДВОЕ)
-        if (stats) {
-          stickers.push({
-            "sticker_type": "native",
-            "sticker": { 
-              "action_type": "text", 
-              "action": {
-                "text": stats, 
-                "style": "classic",
-                "background_style": "none",
-                "selection_color": "#FFD700",
-                "text_color": "#FFD700"
-              },
-              "transform": {
-                "gravity": "center_top",
-                "translation_y": 0.5,
-                "scale": 0.45 // УМЕНЬШЕНО ВДВОЕ
-              }
+        // Пропускаем первую строку (ТЫ СТАЛ: РОЛЬ) - она уже выведена
+        for (let i = 1; i < outcomeLines.length; i++) {
+          const line = outcomeLines[i].trim();
+          if (line) {
+            if (fullOutcome) fullOutcome += "\n";
+            fullOutcome += line;
+          }
+        }
+        
+        // Добавляем как один стикер по середине
+        if (fullOutcome) {
+          // Разбиваем на строки если текст длинный
+          const outcomeLinesArray = fullOutcome.split('\n');
+          outcomeLinesArray.forEach((line, index) => {
+            if (line.trim()) {
+              stickers.push({
+                "sticker_type": "native",
+                "sticker": { 
+                  "action_type": "text", 
+                  "action": {
+                    "text": line, 
+                    "style": "classic",
+                    "background_style": "none",
+                    "selection_color": "#E0F7FF",
+                    "text_color": "#E0F7FF"
+                  },
+                  "transform": {
+                    "gravity": "center",
+                    "translation_y": -0.1 + (index * 0.08), // По середине экрана
+                    "scale": 0.7
+                  }
+                }
+              });
             }
           });
         }
         
-        // 5. Редкость (шрифт уменьшен ВДВОЕ)
+        // 4. Кнопка "ВЫБЕРИ СУДЬБУ" в синем неоновом стиле как СУДЬБА I
         stickers.push({
           "sticker_type": "native",
           "sticker": { 
             "action_type": "text", 
             "action": {
-              "text": "💎 Редкость: Легендарная", 
+              "text": "🌀 ВЫБЕРИ СУДЬБУ", 
               "style": "classic",
               "background_style": "none",
               "selection_color": "#00FFFF",
               "text_color": "#00FFFF"
             },
             "transform": {
-              "gravity": "center_top",
-              "translation_y": 0.57,
-              "scale": 0.45 // УМЕНЬШЕНО ВДВОЕ
-            }
-          }
-        });
-        
-        // 6. Кнопка "Узнай свою судьбу" - В САМОМ НИЗУ
-        stickers.push({
-          "sticker_type": "native",
-          "sticker": { 
-            "action_type": "text", 
-            "action": {
-              "text": "🌀 УЗНАЙ СВОЮ СУДЬБУ", 
-              "style": "classic",
-              "background_style": "none",
-              "selection_color": "#FF1493",
-              "text_color": "#FF1493"
-            },
-            "transform": {
               "gravity": "center_bottom",
               "translation_y": -0.08,
-              "scale": 0.85
+              "scale": 0.9
             }
           }
         });
-        
-        // 7. Подсказка нажать - УДАЛЕНА
         
         // Создаем данные для истории
         const storyData = {
