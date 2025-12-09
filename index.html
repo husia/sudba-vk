@@ -793,7 +793,8 @@
 
     // КОНСТАНТЫ
     const APP_ID = '54388761';
-    const BACKGROUND_IMAGE_URL = "https://sun9-4.userapi.com/s/v1/ig2/VhFPa-WbwKQ7vBJxNWBWRPVX24livPpD3AbKCFonrnZ7CEeQQtjGkHglBeiS5POyK9Ncjn4OT2JjxPva4NHCQlqc.jpg?quality=95&as=32x57,48x85,72x128,108x192,160x284,240x427,360x640,480x853,540x960,640x1138,720x1280,1080x1920&from=bu&cs=1080x0";
+    // НОВАЯ КАРТИНКА
+    const BACKGROUND_IMAGE_URL = "https://sun9-71.userapi.com/s/v1/ig2/wSfL7ZpafMbroZRCGZaqH1wP3oOKe6C7j7bIPT2CJcFSVGUu2SLEBIzUxDWsV4W9qeI_5HrahzutS2YriUEGq3lf.jpg?quality=95&as=32x57,48x85,72x128,108x192,160x284,240x427,360x640,480x853,540x960,640x1138,720x1280,1080x1920&from=bu&cs=1080x0";
 
     // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     let userId = 'demo123';
@@ -933,6 +934,25 @@
       return "Тайная личность";
     }
 
+    // Функция для разбивки текста на строки
+    function splitTextIntoLines(text, maxLength) {
+      const words = text.split(' ');
+      const lines = [];
+      let currentLine = '';
+      
+      for (const word of words) {
+        if ((currentLine + ' ' + word).length <= maxLength) {
+          currentLine = currentLine ? currentLine + ' ' + word : word;
+        } else {
+          if (currentLine) lines.push(currentLine);
+          currentLine = word;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+      
+      return lines;
+    }
+
     // ГЛАВНАЯ ФУНКЦИЯ ШЕРИНГА В ИСТОРИИ
     async function shareToVKStory() {
       if (isSharing) return;
@@ -949,11 +969,170 @@
         updateStatus('✨ VK Bridge инициализирован');
         
         const outcome = currentResult;
-        const title = getTitle(outcome);
+        const lines = outcome.split('\n');
+        let role = "Тайная личность";
+        let description = "";
+        let stats = "";
+        
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (line.includes("ТЫ СТАЛ: ")) {
+            role = line.split("ТЫ СТАЛ: ")[1].replace(/[💎🏆🌀✨]/g, '').trim();
+          } else if (line && !line.includes("ТЫ СТАЛ:") && !line.includes("Уровень")) {
+            if (description) description += "\n";
+            description += line;
+          } else if (line.includes("Уровень")) {
+            stats = line;
+          }
+        }
         
         // Проверяем доступность фона
         updateStatus('🌀 Проверяю фон...');
         await testImage(BACKGROUND_IMAGE_URL);
+        
+        // Создаем стикеры с полным форматированием результата
+        const stickers = [];
+        
+        // 1. Заголовок "ТЫ СТАЛ:"
+        stickers.push({
+          "sticker_type": "native",
+          "sticker": { 
+            "action_type": "text", 
+            "action": {
+              "text": "ТЫ СТАЛ:", 
+              "style": "classic",
+              "background_style": "none",
+              "selection_color": "#FFD700",
+              "text_color": "#FFD700"
+            },
+            "transform": {
+              "gravity": "center_top",
+              "translation_y": 0.15
+            }
+          }
+        });
+        
+        // 2. Название роли (можем разбить на несколько строк если длинное)
+        const roleLines = splitTextIntoLines(role, 15);
+        roleLines.forEach((line, index) => {
+          stickers.push({
+            "sticker_type": "native",
+            "sticker": { 
+              "action_type": "text", 
+              "action": {
+                "text": line, 
+                "style": "classic",
+                "background_style": "none",
+                "selection_color": "#00FFFF",
+                "text_color": "#00FFFF"
+              },
+              "transform": {
+                "gravity": "center_top",
+                "translation_y": 0.25 + (index * 0.07)
+              }
+            }
+          });
+        });
+        
+        // 3. Описание (первые 3 строки)
+        const descLines = description.split('\n').slice(0, 3);
+        descLines.forEach((line, index) => {
+          stickers.push({
+            "sticker_type": "native",
+            "sticker": { 
+              "action_type": "text", 
+              "action": {
+                "text": line, 
+                "style": "classic",
+                "background_style": "none",
+                "selection_color": "#E0F7FF",
+                "text_color": "#E0F7FF"
+              },
+              "transform": {
+                "gravity": "center_top",
+                "translation_y": 0.4 + (index * 0.06)
+              }
+            }
+          });
+        });
+        
+        // 4. Статистика
+        if (stats) {
+          stickers.push({
+            "sticker_type": "native",
+            "sticker": { 
+              "action_type": "text", 
+              "action": {
+                "text": stats, 
+                "style": "classic",
+                "background_style": "none",
+                "selection_color": "#FFD700",
+                "text_color": "#FFD700"
+              },
+              "transform": {
+                "gravity": "center_top",
+                "translation_y": 0.6
+              }
+            }
+          });
+        }
+        
+        // 5. Редкость
+        stickers.push({
+          "sticker_type": "native",
+          "sticker": { 
+            "action_type": "text", 
+            "action": {
+              "text": "💎 Редкость: Легендарная", 
+              "style": "classic",
+              "background_style": "none",
+              "selection_color": "#00FFFF",
+              "text_color": "#00FFFF"
+            },
+            "transform": {
+              "gravity": "center_top",
+              "translation_y": 0.68
+            }
+          }
+        });
+        
+        // 6. Кнопка перехода в игру
+        stickers.push({
+          "sticker_type": "native",
+          "sticker": { 
+            "action_type": "text", 
+            "action": {
+              "text": "🌀 УЗНАЙ СВОЮ СУДЬБУ", 
+              "style": "classic",
+              "background_style": "none",
+              "selection_color": "#FF1493",
+              "text_color": "#FF1493"
+            },
+            "transform": {
+              "gravity": "center_bottom",
+              "translation_y": -0.15
+            }
+          }
+        });
+        
+        // 7. Подсказка нажать
+        stickers.push({
+          "sticker_type": "native",
+          "sticker": { 
+            "action_type": "text", 
+            "action": {
+              "text": "👇 Нажми 'Играть' внизу", 
+              "style": "classic",
+              "background_style": "none",
+              "selection_color": "#7CFC00",
+              "text_color": "#7CFC00"
+            },
+            "transform": {
+              "gravity": "center_bottom",
+              "translation_y": -0.25
+            }
+          }
+        });
         
         // Создаем данные для истории
         const storyData = {
@@ -964,42 +1143,7 @@
             type: 'url',
             url: `https://vk.com/app${APP_ID}`
           },
-          stickers: [
-            {
-              "sticker_type": "native",
-              "sticker": { 
-                "action_type": "text", 
-                "action": {
-                  "text": `🔥 ${title}`, 
-                  "style": "classic",
-                  "background_style": "none",
-                  "selection_color": "#FF416C",
-                  "text_color": "#FFFFFF"
-                },
-                "transform": {
-                  "gravity": "center_top",
-                  "translation_y": 0.2
-                }
-              }
-            },
-            {
-              "sticker_type": "native",
-              "sticker": { 
-                "action_type": "text", 
-                "action": {
-                  "text": "🌀 Узнай свою судьбу!", 
-                  "style": "classic",
-                  "background_style": "none",
-                  "selection_color": "#00FFFF",
-                  "text_color": "#00FFFF"
-                },
-                "transform": {
-                  "gravity": "center_bottom",
-                  "translation_y": -0.25
-                }
-              }
-            }
-          ]
+          stickers: stickers
         };
         
         updateStatus('✨ Создаю историю...');
