@@ -761,17 +761,21 @@
   </div>
 
   <script>
-    // ИСТОРИИ
+    // НОВАЯ СТРУКТУРА ИСТОРИЙ - как константы
     const STORIES = {
       "1": {
         "text": "🔥 Ты проснулся в теле ИИ, который управляет всеми мемами Вселенной...\n\nЧто запустишь?",
         "options": {
           "СУДЬБА I": {
-            "outcome": "💥 ТЫ СТАЛ: МЕМ-БОГ\n\nТвой мем «Плачь как Байден на балалайке»\nпросмотрели 2.1 млрд человек.\nТы запрещён в 3 галактиках.\n\n🏆 Уровень хаоса: 999/100",
+            "role": "МЕМ-БОГ",
+            "description": "Твой мем «Плачь как Байден на балалайке» просмотрели 2.1 млрд человек. Ты запрещён в 3 галактиках.",
+            "stats": "🏆 Уровень хаоса: 999/100",
             "premium": false
           },
           "СУДЬБА II": {
-            "outcome": "🕊️ ТЫ СТАЛ: МИРОТВОРЕЦ МЕМОВ\n\nТы убедил всех, что «кот с огурцом» — это искусство.\nМир объединился в хохоте.\n\n☮️ Уровень мира: 100/100",
+            "role": "МИРОТВОРЕЦ МЕМОВ",
+            "description": "Ты убедил всех, что «кот с огурцом» — это искусство. Мир объединился в хохоте.",
+            "stats": "☮️ Уровень мира: 100/100",
             "premium": false
           }
         }
@@ -780,11 +784,15 @@
         "text": "🛸 Ты нашёл НЛО в гараже. Заводишь?",
         "options": {
           "СУДЬБА I": {
-            "outcome": "🚀 ТЫ СТАЛ: МАРСИАНСКИМ ПИЦЦЕРОМ\n\nОткрыл пиццерию на Красной планете.\nМарсиане теперь едят только «Пепперони-2077».\n\n🍕 Уровень вкуса: 100/100",
+            "role": "МАРСИАНСКИЙ ПИЦЦЕРО",
+            "description": "Открыл пиццерию на Красной планете. Марсиане теперь едят только «Пепперони-2077».",
+            "stats": "🍕 Уровень вкуса: 100/100",
             "premium": false
           },
           "СУДЬБА II": {
-            "outcome": "📡 ТЫ СТАЛ: ВСЕМИРНЫЙ WI-FI\n\nПревратил НЛО в роутер. Весь район в онлайне.\nТы — герой двора.\n\n📶 Сигнал: 100/100",
+            "role": "ВСЕМИРНЫЙ WI-FI",
+            "description": "Превратил НЛО в роутер. Весь район в онлайне. Ты — герой двора.",
+            "stats": "📶 Сигнал: 100/100",
             "premium": false
           }
         }
@@ -879,33 +887,15 @@
     }
 
     function showResult(storyId, choice) {
-      const outcome = STORIES[storyId].options[choice].outcome;
-      currentResult = outcome;
-      
-      // Парсим результат для красивого отображения
-      const lines = outcome.split('\n');
-      let role = "Тайная личность";
-      let description = "";
-      let stats = "";
-      
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line.includes("ТЫ СТАЛ: ")) {
-          role = line.split("ТЫ СТАЛ: ")[1].replace(/[💎🏆🌀✨]/g, '').trim();
-        } else if (line && !line.includes("ТЫ СТАЛ:") && !line.includes("Уровень")) {
-          if (description) description += "<br>";
-          description += line;
-        } else if (line.includes("Уровень")) {
-          stats = line;
-        }
-      }
+      const option = STORIES[storyId].options[choice];
+      currentResult = option;
       
       const resultHtml = `
         <div class="result">
           <span class="result-title">ТЫ СТАЛ:</span>
-          <span class="result-role">${role}</span>
-          <div class="result-description">${description}</div>
-          ${stats ? `<div class="result-stats">${stats}</div>` : ''}
+          <span class="result-role">${option.role}</span>
+          <div class="result-description">${option.description}</div>
+          <div class="result-stats">${option.stats}</div>
           <div class="rarity">💎 Редкость: Легендарная</div>
         </div>
         
@@ -923,7 +913,7 @@
       document.getElementById('game').innerHTML = resultHtml;
     }
 
-        // ГЛАВНАЯ ФУНКЦИЯ ШЕРИНГА В ИСТОРИИ
+    // ГЛАВНАЯ ФУНКЦИЯ ШЕРИНГА В ИСТОРИИ
     async function shareToVKStory() {
       if (isSharing) return;
       isSharing = true;
@@ -938,23 +928,11 @@
         await window.vkBridge.send('VKWebAppInit', {});
         updateStatus('✨ VK Bridge инициализирован');
         
-        const outcome = currentResult;
-        const lines = outcome.split('\n');
-        let role = "Тайная личность";
-        let description = "";
-        let stats = "";
-        
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (line.includes("ТЫ СТАЛ: ")) {
-            role = line.split("ТЫ СТАЛ: ")[1].replace(/[💎🏆🌀✨]/g, '').trim();
-          } else if (line && !line.includes("ТЫ СТАЛ:") && !line.includes("Уровень")) {
-            if (description) description += "\n";
-            description += line;
-          } else if (line.includes("Уровень")) {
-            stats = line;
-          }
+        if (!currentResult) {
+          throw new Error('Нет результата для публикации');
         }
+        
+        const { role, description, stats } = currentResult;
         
         // Проверяем доступность нового фона
         updateStatus('🌀 Проверяю фон...');
@@ -963,6 +941,26 @@
         // Создаем стикеры с правильным расположением
         const stickers = [];
         
+        // 1. Заголовок "ТЫ СТАЛ:" - ближе к верху
+        stickers.push({
+          "sticker_type": "native",
+          "sticker": { 
+            "action_type": "text", 
+            "action": {
+              "text": "ТЫ СТАЛ:", 
+              "style": "classic",
+              "background_style": "none",
+              "selection_color": "#FFD700",
+              "text_color": "#FFD700"
+            },
+            "transform": {
+              "gravity": "center_top",
+              "translation_y": 0.08, // Ближе к верху
+              "scale": 1.0 // Нормальный размер
+            }
+          }
+        });
+        
         // 2. Название роли - сразу под заголовком
         stickers.push({
           "sticker_type": "native",
@@ -970,7 +968,7 @@
             "action_type": "text", 
             "action": {
               "text": role, 
-              "style": "neon",
+              "style": "classic",
               "background_style": "none",
               "selection_color": "#00FFFF",
               "text_color": "#00FFFF"
@@ -978,29 +976,85 @@
             "transform": {
               "gravity": "center_top",
               "translation_y": 0.18, // Ближе к заголовку
+              "scale": 0.9
             }
           }
         });
-
+        
+        // 3. ОПИСАНИЕ В ЦЕНТРЕ ЭКРАНА
+        // Разбиваем описание на строки
+        const descLines = splitTextIntoLines(description, 35);
+        
+        // Вычисляем позицию для центрирования
+        const totalLines = descLines.length;
+        const startY = -0.05 - (totalLines * 0.04) / 2;
+        
+        descLines.forEach((line, index) => {
+          if (line.trim()) {
+            stickers.push({
+              "sticker_type": "native",
+              "sticker": { 
+                "action_type": "text", 
+                "action": {
+                  "text": line, 
+                  "style": "classic",
+                  "background_style": "none",
+                  "selection_color": "#E0F7FF",
+                  "text_color": "#E0F7FF"
+                },
+                "transform": {
+                  "gravity": "center",
+                  "translation_y": startY + (index * 0.08), // В центре экрана
+                  "scale": 0.75
+                }
+              }
+            });
+          }
+        });
+        
+        // 4. Статистика - под описанием
+        if (stats) {
+          stickers.push({
+            "sticker_type": "native",
+            "sticker": { 
+              "action_type": "text", 
+              "action": {
+                "text": stats, 
+                "style": "classic",
+                "background_style": "none",
+                "selection_color": "#FFD700",
+                "text_color": "#FFD700"
+              },
+              "transform": {
+                "gravity": "center",
+                "translation_y": 0.25, // Под описанием
+                "scale": 0.7
+              }
+            }
+          });
+        }
+        
+        // 5. Редкость
         stickers.push({
           "sticker_type": "native",
           "sticker": { 
             "action_type": "text", 
             "action": {
-              "text": description, 
+              "text": "💎 Редкость: Легендарная", 
               "style": "classic",
               "background_style": "none",
-              "selection_color": "#ffFFFF",
-              "text_color": "#FFFFFF"
+              "selection_color": "#00FFFF",
+              "text_color": "#00FFFF"
             },
             "transform": {
               "gravity": "center",
-              "translation_y": 1, // Ближе к заголовку
+              "translation_y": 0.33,
+              "scale": 0.7
             }
           }
         });
-       
-        // 4. Кнопка "ВЫБЕРИ СУДЬБУ" в синем неоновом стиле как СУДЬБА I
+        
+        // 6. Кнопка "ВЫБЕРИ СУДЬБУ" в синем неоновом стиле как СУДЬБА I
         stickers.push({
           "sticker_type": "native",
           "sticker": { 
@@ -1062,6 +1116,25 @@
       } finally {
         isSharing = false;
       }
+    }
+
+    // Функция для разделения текста на строки
+    function splitTextIntoLines(text, maxLength) {
+      const words = text.split(' ');
+      const lines = [];
+      let currentLine = '';
+      
+      for (const word of words) {
+        if ((currentLine + ' ' + word).length <= maxLength || currentLine === '') {
+          currentLine = currentLine ? currentLine + ' ' + word : word;
+        } else {
+          lines.push(currentLine);
+          currentLine = word;
+        }
+      }
+      if (currentLine) lines.push(currentLine);
+      
+      return lines;
     }
 
     // Функция для проверки доступности изображения
