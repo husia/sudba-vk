@@ -963,26 +963,6 @@
         // Создаем стикеры с правильным расположением
         const stickers = [];
         
-        // 1. Заголовок "ТЫ СТАЛ:" - ближе к верху
-        stickers.push({
-          "sticker_type": "native",
-          "sticker": { 
-            "action_type": "text", 
-            "action": {
-              "text": "ТЫ СТАЛ:", 
-              "style": "classic",
-              "background_style": "none",
-              "selection_color": "#FFD700",
-              "text_color": "#FFD700"
-            },
-            "transform": {
-              "gravity": "center_top",
-              "translation_y": 0.08, // Ближе к верху
-              "scale": 1.0 // Нормальный размер
-            }
-          }
-        });
-        
         // 2. Название роли - сразу под заголовком
         stickers.push({
           "sticker_type": "native",
@@ -990,6 +970,24 @@
             "action_type": "text", 
             "action": {
               "text": role, 
+              "style": "neon",
+              "background_style": "none",
+              "selection_color": "#00FFFF",
+              "text_color": "#00FFFF"
+            },
+            "transform": {
+              "gravity": "center_top",
+              "translation_y": 0.18, // Ближе к заголовку
+            }
+          }
+        });
+
+        stickers.push({
+          "sticker_type": "native",
+          "sticker": { 
+            "action_type": "text", 
+            "action": {
+              "text": outcome, 
               "style": "classic",
               "background_style": "none",
               "selection_color": "#00FFFF",
@@ -998,53 +996,10 @@
             "transform": {
               "gravity": "center_top",
               "translation_y": 0.18, // Ближе к заголовку
-              "scale": 0.9
             }
           }
         });
-        
-        // 3. Весь outcome в одном сообщении по середине
-        // Собираем полное описание
-        let fullOutcome = "";
-        const outcomeLines = outcome.split('\n');
-        
-        // Пропускаем первую строку (ТЫ СТАЛ: РОЛЬ) - она уже выведена
-        for (let i = 1; i < outcomeLines.length; i++) {
-          const line = outcomeLines[i].trim();
-          if (line) {
-            if (fullOutcome) fullOutcome += "\n";
-            fullOutcome += line;
-          }
-        }
-        
-        // Добавляем как один стикер по середине
-        if (fullOutcome) {
-          // Разбиваем на строки если текст длинный
-          const outcomeLinesArray = fullOutcome.split('\n');
-          outcomeLinesArray.forEach((line, index) => {
-            if (line.trim()) {
-              stickers.push({
-                "sticker_type": "native",
-                "sticker": { 
-                  "action_type": "text", 
-                  "action": {
-                    "text": line, 
-                    "style": "classic",
-                    "background_style": "none",
-                    "selection_color": "#E0F7FF",
-                    "text_color": "#E0F7FF"
-                  },
-                  "transform": {
-                    "gravity": "center",
-                    "translation_y": -0.1 + (index * 0.08), // По середине экрана
-                    "scale": 0.7
-                  }
-                }
-              });
-            }
-          });
-        }
-        
+       
         // 4. Кнопка "ВЫБЕРИ СУДЬБУ" в синем неоновом стиле как СУДЬБА I
         stickers.push({
           "sticker_type": "native",
