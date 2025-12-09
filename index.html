@@ -275,20 +275,26 @@
       }
     }
     
-    .destiny-btn .btn-text::after {
+    /* ПОЛОСКА ТОЛЬКО ДЛЯ КНОПОК ВЫБОРА (СУДЬБА I/II) */
+    .destiny-btn:not(.btn-share):not(.btn-play-again) .btn-text::after {
       content: '';
       position: absolute;
       bottom: 0;
       left: 0;
-      width: 100%;
+      width: 0;
       height: 2px;
       background: linear-gradient(90deg, #00FFFF, transparent);
-      transform: scaleX(0);
-      transition: transform 0.3s;
+      transition: width 0.3s ease;
     }
     
-    .destiny-btn:hover .btn-text::after {
-      transform: scaleX(1);
+    .destiny-btn:not(.btn-share):not(.btn-play-again):hover .btn-text::after {
+      width: 100%;
+    }
+    
+    /* Убираем полоску у кнопок шеринга и повтора игры */
+    .destiny-btn.btn-share .btn-text::after,
+    .destiny-btn.btn-play-again .btn-text::after {
+      display: none !important;
     }
     
     /* Анимация свечения при наведении */
