@@ -956,7 +956,6 @@
             "transform": {
               "gravity": "center_top",
               "translation_y": 0.08, // Ближе к верху
-              "scale": 1.0 // Нормальный размер
             }
           }
         });
@@ -976,84 +975,30 @@
             "transform": {
               "gravity": "center_top",
               "translation_y": 0.18, // Ближе к заголовку
-              "scale": 0.9
             }
           }
         });
-        
-        // 3. ОПИСАНИЕ В ЦЕНТРЕ ЭКРАНА
-        // Разбиваем описание на строки
-        const descLines = splitTextIntoLines(description, 35);
-        
-        // Вычисляем позицию для центрирования
-        const totalLines = descLines.length;
-        const startY = -0.05 - (totalLines * 0.04) / 2;
-        
-        descLines.forEach((line, index) => {
-          if (line.trim()) {
-            stickers.push({
-              "sticker_type": "native",
-              "sticker": { 
-                "action_type": "text", 
-                "action": {
-                  "text": line, 
-                  "style": "classic",
-                  "background_style": "none",
-                  "selection_color": "#E0F7FF",
-                  "text_color": "#E0F7FF"
-                },
-                "transform": {
-                  "gravity": "center",
-                  "translation_y": startY + (index * 0.08), // В центре экрана
-                  "scale": 0.75
-                }
-              }
-            });
-          }
-        });
-        
-        // 4. Статистика - под описанием
-        if (stats) {
-          stickers.push({
-            "sticker_type": "native",
-            "sticker": { 
-              "action_type": "text", 
-              "action": {
-                "text": stats, 
-                "style": "classic",
-                "background_style": "none",
-                "selection_color": "#FFD700",
-                "text_color": "#FFD700"
-              },
-              "transform": {
-                "gravity": "center",
-                "translation_y": 0.25, // Под описанием
-                "scale": 0.7
-              }
-            }
-          });
-        }
-        
-        // 5. Редкость
+
+        // 2. Название роли - сразу под заголовком
         stickers.push({
           "sticker_type": "native",
           "sticker": { 
             "action_type": "text", 
             "action": {
-              "text": "💎 Редкость: Легендарная", 
+              "text": description, 
               "style": "classic",
               "background_style": "none",
               "selection_color": "#00FFFF",
-              "text_color": "#00FFFF"
+              "text_color": "#ffffff"
             },
             "transform": {
               "gravity": "center",
-              "translation_y": 0.33,
-              "scale": 0.7
+             // "translation_y": 0.18, // Ближе к заголовку
+             // "scale": 0.9
             }
           }
         });
-        
+
         // 6. Кнопка "ВЫБЕРИ СУДЬБУ" в синем неоновом стиле как СУДЬБА I
         stickers.push({
           "sticker_type": "native",
