@@ -941,25 +941,6 @@
         // Создаем стикеры с правильным расположением
         const stickers = [];
         
-        // 1. Заголовок "ТЫ СТАЛ:" - ближе к верху
-        stickers.push({
-          "sticker_type": "native",
-          "sticker": { 
-            "action_type": "text", 
-            "action": {
-              "text": "ТЫ СТАЛ:", 
-              "style": "classic",
-              "background_style": "none",
-              "selection_color": "#FFD700",
-              "text_color": "#FFD700"
-            },
-            "transform": {
-              "gravity": "center_top",
-              "translation_y": 0.08, // Ближе к верху
-            }
-          }
-        });
-        
         // 2. Название роли - сразу под заголовком
         stickers.push({
           "sticker_type": "native",
@@ -986,9 +967,9 @@
             "action_type": "text", 
             "action": {
               "text": description, 
-              "style": "classic",
+              "style": "neon",
               "background_style": "none",
-              "selection_color": "#00FFFF",
+              "selection_color": "#ffffff",
               "text_color": "#ffffff"
             },
             "transform": {
